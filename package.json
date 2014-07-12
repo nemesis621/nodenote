@@ -1,6 +1,7 @@
 {
     "name": "NodeNotes",
     "description": "sharing notes",
+    "repository"  : "https://github.com/nemesis621/nodenote.git",
     "version": "0.1.0",
     "dependencies": {
         "express": "3.3.*",
