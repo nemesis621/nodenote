@@ -1,0 +1,16 @@
+{
+    "name": "NodeNotes",
+    "description": "sharing notes",
+    "version": "0.1.0",
+    "dependencies": {
+        "express": "3.3.*",
+        "mysql": "2.3.2",
+        "orm": "*",
+        "lodash": "2.3.0",
+        "nodemon": "0.7.10",
+        "moment": "2.4.0",
+        "colors": "0.6.2",
+        "jade": "~1.3.0",
+        "static-favicon": "~1.0.0"
+    }
+}

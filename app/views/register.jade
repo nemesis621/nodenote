@@ -1,0 +1,14 @@
+extends layout
+
+block content
+    h1= title
+    p Welcome to #{title}
+    form(action='/register',method='post')
+        input(id='reg_name',type='text',value='',placeholder='Name',name='name')
+        input(id='reg_password',type='password',value='',placeholder='Password',name='password')
+        input(id='reg_passwordrpt',type='password',value='',placeholder='Password wiederholen',name='passwordrpt')
+        input(type='submit',value='Registrieren')
+    if success
+        p ne mail wurde versandt...
+    else
+        p gib deine daten an
