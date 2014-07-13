@@ -13,6 +13,9 @@ module.exports = function(app){
             req.models.user.find(params, function (err, user) {
                 if(user.length == 1){
                     req.session.userid = user[0].id;
+                    res.cookie('user_id', user[0].id);
+                    res.cookie('user_id2', user[0].id);
+
                     res.render('index', { title: 'Express', loggedin: true });
                 } else {
                     res.render('login', { title: 'Express' });

@@ -2,6 +2,7 @@ $(document).ready(function() {
 
     var iosocket = io.connect();
     iosocket.on('connect', function () {
+
         console.log('connected');
 //        iosocket.on('message', function (message) {
 //            displayMessage(message);
@@ -11,4 +12,9 @@ $(document).ready(function() {
 //            $('#chatcontent').append('<li class="txt_red">Disconnected</li>');
 //        });
     });
+    var message = {
+        name: "wurst"
+    };
+    iosocket.json.send(message);
+
 });

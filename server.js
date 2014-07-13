@@ -8,11 +8,20 @@ var routes      = require('./config/routes');
 
 module.exports.start = function (done) {
     var app = express();
+    var user = function(user_id){
+        var socket = null;
+        var user_id = user_id;
+
+        var invite = function(){
+
+
+        }
+    };
 
     environment(app);
     routes(app);
 
-    app.listen(settings.port, function () {
+    var server = app.listen(settings.port, function () {
         console.log( ("Listening on port " + settings.port).green );
 
         if (done) {
@@ -27,9 +36,19 @@ module.exports.start = function (done) {
         }
     });
 
-    var io = require('socket.io').listen(app);
+    var io = require('socket.io').listen(server);
+    io.on('connection', function (socket) {
+        socket.on('connect', function (msg) {
+            console.log(msg);
+        });
 
-
+        socket.on('message', function (msg) {
+            console.log(msg);
+        });
+        socket.on('disconnet', function (msg) {
+            console.log(msg);
+        });
+    });
 }
 
 
