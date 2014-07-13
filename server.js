@@ -26,7 +26,12 @@ module.exports.start = function (done) {
             return done(e);
         }
     });
+
+    var io = require('socket.io').listen(app);
+
+
 }
+
 
 // If someone ran: "node server.js" then automatically start the server
 if (path.basename(process.argv[1],'.js') == path.basename(__filename,'.js')) {

@@ -1,0 +1,8 @@
+extends layout
+
+block content
+    h1 Login
+    form(action='/login',method='post')
+        input(id='login_name',type='text',value='',placeholder='Name',name='name')
+        input(id='login_pass',type='text',value='',placeholder='Email',name='password')
+        input(type='submit',value='Login')

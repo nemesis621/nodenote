@@ -3,3 +3,5 @@ block content
     h1= title
     p Welcome to #{title}
     a(class='button', href='/register') Register
+    if loggedin
+        p Du bist eingeloggt!

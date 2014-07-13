@@ -13,6 +13,7 @@
         "colors": "0.6.2",
         "jade": "~1.3.0",
         "static-favicon": "~1.0.0",
-        "express-mailer": "*"
+        "express-mailer": "*",
+        "socket.io": "1.0"
     }
 }
