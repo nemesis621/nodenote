@@ -1,15 +1,16 @@
 var path     = require('path');
 var express  = require('express');
 var favicon  = require('static-favicon');
+var mailer   = require('express-mailer');
 var settings = require('./settings');
 var models   = require('../app/models/index');
 
 module.exports = function (app) {
     app.configure(function () {
+
         // view engine setup
         app.set('views', path.join(settings.path, '/app/views'));
         app.set('view engine', 'jade');
-
 
         app.use(express.static(path.join(settings.path, 'public')));
         app.use(express.logger({ format: 'dev' }));
@@ -25,5 +26,7 @@ module.exports = function (app) {
             });
         }),
         app.use(app.router);
+
+        mailer.extend(app, settings.mail);
     });
 };

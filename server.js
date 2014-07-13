@@ -1,10 +1,10 @@
 var path        = require('path');
 var express     = require('express');
 var colors      = require('colors');
+
 var settings    = require('./config/settings');
 var environment = require('./config/environment');
 var routes      = require('./config/routes');
-var models      = require('./app/models/');
 
 module.exports.start = function (done) {
     var app = express();

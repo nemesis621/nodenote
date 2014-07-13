@@ -2,8 +2,8 @@ var controllers = require('../app/controllers/index')
 
 module.exports = function (app) {
     app.get('/'                         , controllers.home.index);
-    app.get('/register'                 , controllers.register.index);
-    app.post('/register'                , controllers.register.validate);
+    app.get('/register'                 , controllers.register(app).index);
+    app.post('/register'                , controllers.register(app).validate);
 
 //    app.get( '/messages'                   , controllers.messages.list);
 //    app.post('/messages'                   , controllers.messages.create);
