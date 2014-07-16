@@ -38,9 +38,8 @@ module.exports.start = function (done) {
 
     var io = require('socket.io').listen(server);
     io.on('connection', function (socket) {
-        socket.on('connect', function (msg) {
-            console.log(msg);
-        });
+        console.log(socket.id);
+        
 
         socket.on('message', function (msg) {
             console.log(msg);

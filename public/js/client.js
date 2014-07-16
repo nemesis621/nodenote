@@ -2,8 +2,14 @@ $(document).ready(function() {
 
     var iosocket = io.connect();
     iosocket.on('connect', function () {
+        var message = {
+            name: "cookie kram wenn ne id drin steht "
+        };
+//        iosocket.json.send(message);
 
         console.log('connected');
+
+
 //        iosocket.on('message', function (message) {
 //            displayMessage(message);
 //        });
@@ -12,9 +18,6 @@ $(document).ready(function() {
 //            $('#chatcontent').append('<li class="txt_red">Disconnected</li>');
 //        });
     });
-    var message = {
-        name: "wurst"
-    };
-    iosocket.json.send(message);
+
 
 });
