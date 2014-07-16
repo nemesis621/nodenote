@@ -2,6 +2,7 @@ var path = require('path');
 
 var settings = {
     path       : path.normalize(path.join(__dirname, '..')),
+    baseurl    : 'http://localhost:3000',
     port       : 3000,
     database   : {
         protocol : "mysql",

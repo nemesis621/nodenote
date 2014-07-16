@@ -4,6 +4,7 @@ module.exports = function (app) {
     app.get('/'                         , controllers.home.index);
     app.get('/register'                 , controllers.register(app).index);
     app.post('/register'                , controllers.register(app).validate);
+    app.get('/register/:token'          , controllers.register(app).complete);
     app.get('/login'                    , controllers.login(app).index);
     app.post('/login'                   , controllers.login(app).execute);
 

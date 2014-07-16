@@ -2,13 +2,15 @@ extends layout
 
 block content
     h1 Register
+
     form(action='/register',method='post')
-        input(id='reg_name',type='text',value='',placeholder='Name',name='name')
-        input(id='reg_email',type='text',value='',placeholder='Email',name='email')
-        input(id='reg_password',type='password',value='',placeholder='Password',name='password')
+        input(id='reg_displayname',type='text',value='', placeholder='Anzeigename',name='display_name')
+        input(id='reg_firstname',type='text',value='', placeholder='Vorname',name='first_name')
+        input(id='reg_lastname',type='text',value='', placeholder='Nachname',name='last_name')
+        input(id='reg_email',type='text',value='',placeholder='Email-Adresse',name='email')
+        input(id='reg_password',type='password',value='',placeholder='Passwort',name='password')
         input(id='reg_passwordrpt',type='password',value='',placeholder='Password wiederholen',name='passwordrpt')
         input(type='submit',value='Registrieren')
-    if success
-        p ne mail wurde versandt...
-    else
-        p gib deine daten an
+
+    if complete
+        p registration complete!

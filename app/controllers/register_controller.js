@@ -1,4 +1,7 @@
 var _       = require('lodash');
+var sha1 = require('sha1');
+var moment = require('moment');
+var settings = require('../../config/settings');
 
 module.exports = function(app){
     return {
@@ -7,10 +10,16 @@ module.exports = function(app){
         },
 
         validate: function (req, res, next) {
-            var params = _.pick(req.body, 'name', 'email', 'password');
+            var params = _.pick(req.body, 'display_name', 'first_name', 'last_name', 'email', 'password');
+            params.registration_token = sha1(moment().format('MMMM Do YYYY, h:mm:ss a'));
+
+            var url = settings.baseurl + '/register/' + params.registration_token;
+            console.log(url);
+
 
             req.models.user.create(params, function (err, message) {
                 if(err) {
+                    console.log(err);
                     throw new Error('Oh oh, an error has occured');
                 } else {
                     res.render('register', { title: 'Express', success: true });
@@ -35,6 +44,13 @@ module.exports = function(app){
 //                res.render('register', { title: 'Express', success: true });
 //            });
 
+        },
+        complete: function (req, res, next) {
+            var token =  req.param("token");
+
+            // token validieren -> user auf active = 1 setzen
+
+            res.render('register', { title: 'Express', complete: true });
         }
     }
 };
