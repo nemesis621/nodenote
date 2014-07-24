@@ -25,16 +25,28 @@ html
                         span(class='icon-bar')
                     a(class='navbar-brand', href='/') notenodes
                 div(class='navbar-collapse collapse')
-                    ul(class='nav navbar-nav')
-                        li(class='dropdown')
-                            a(href='#', data-toggle='dropdown', class='dropdown-toggle')
-                                span friends
-                                span(class='caret')
-                            ul(class='dropdown-menu')
-                                li
-                                    a(href='#') entry1
-                                li
-                                    a(href='#') entry2
+                    if loggedin
+                        ul(class='nav navbar-nav')
+                            li(class='dropdown')
+                                a(href='#', data-toggle='dropdown', class='dropdown-toggle')
+                                    span friends
+                                    span(class='caret')
+                                ul(class='dropdown-menu')
+                                    li
+                                        a(href='#') entry1
+                                    li
+                                        a(href='#') entry2
+
+                        ul(class='nav navbar-nav navbar-right')
+                            li
+                                a(href='/logout')
+                                    span(class='glyphicon glyphicon-off')
+                    else
+                        ul(class='nav navbar-nav navbar-right')
+                            li
+                                a(href='/login') Einloggen
+                            li
+                                a(href='/register') Registrieren
 
         div(id='wrap')
             div(class='container')

@@ -35,20 +35,7 @@ $(document).ready(function() {
                     $('#invite_button').trigger(e);
                 }
             });
-
-
-        //        iosocket.on('message', function (message) {
-        //            displayMessage(message);
-        //        });
-        //
-        //        iosocket.on('disconnect', function () {
-        //            $('#chatcontent').append('<li class="txt_red">Disconnected</li>');
-        //        });
         });
-
-
-
-
     }
 
 
@@ -61,6 +48,35 @@ $(document).ready(function() {
             return false;
         }
     });
+
+    // Loginformular validieren
+    $('#login_submit').click(function(){
+        var emailfield = $('#login_email');
+        var passfield = $('#login_pass');
+
+        var error = false;
+
+        if(!validateEmail(emailfield.val())){
+            emailfield.parent().addClass('has-error');
+            emailfield.effect('shake', {distance: 10, times: 2});
+            error = true;
+        } else {
+            emailfield.parent().removeClass('has-error');
+        }
+
+        if(passfield.val() == ''){
+            passfield.parent().addClass('has-error');
+            passfield.effect('shake', {distance: 10, times: 2});
+            error = true;
+        } else {
+            passfield.parent().removeClass('has-error');
+        }
+
+        if(error) return false;
+    });
+
+
+
 
 });
 

@@ -1,20 +1,72 @@
 extends layout
 
 block content
-    h1 Register
-    if complete
-        p your registration is completed
-    else
-        if reg_success
-            p registration successfull
-            //if mail_success
-            //    p a mail was send...
-        else
-            form(action='/register',method='post')
-                input(id='reg_displayname',type='text',value='', placeholder='Anzeigename',name='display_name')
-                input(id='reg_firstname',type='text',value='', placeholder='Vorname',name='first_name')
-                input(id='reg_lastname',type='text',value='', placeholder='Nachname',name='last_name')
-                input(id='reg_email',type='text',value='',placeholder='Email-Adresse',name='email')
-                input(id='reg_password',type='password',value='',placeholder='Passwort',name='password')
-                input(id='reg_passwordrpt',type='password',value='',placeholder='Password wiederholen',name='passwordrpt')
-                input(type='submit',value='Registrieren')
+    div(class='container')
+        div(class='row')
+            div(class='col-sm-8 col-md-10 col-lg-12')
+                if complete
+                    // erfolgsmeldung + zum login formular weiterleiten
+                    div(class='alert alert-success')
+                        a(class='close', data-dismiss='alert') &times;
+                        span Die Registrierung wurde erfolgreich abgeschlossen.
+                        br
+                        span Sie werden nun auf die Login-Seite weitergeleitet.
+                            strong(id='reg_cntdown') 5
+
+                        script(type='text/javascript').
+                            var SecVar = 5; // Zeit (in Sekunden)
+                            var UrlVar = "/login"; // Weiterleitungs-URL
+                            var SetInt = window.setInterval("redirCont()", 1000);
+                            function redirCont(){
+                                SecVar--;
+                                $('#reg_cntdown').html(SecVar);
+                                if(SecVar==0){
+                                    window.clearInterval(SetInt);
+                                    window.location = UrlVar;
+                                }
+                            }
+                else
+                    div(class='page-header')
+                        h3 Registrieren
+                        div(class='col-lg-8')
+                            if error
+                                br
+                                div(class='alert alert-danger')
+                                    a(class='close', data-dismiss='alert') &times;
+                                    span Speichern der Daten ist fehlgeschlagen ...
+                            p
+                            form(class='form-horizontal', action='/register',method='post')
+                                fieldset
+                                    div(class='control-group')
+                                        label(class='control-label' for='reg_displayname') Anzeigename
+                                        div(class='controls')
+                                            input(id='reg_displayname', name='display_name', type='text', placeholder='Anzeigename', class='input-xlarge form-control')
+
+                                    div(class='control-group')
+                                        label(class='control-label' for='reg_firstname') Vorname
+                                        div(class='controls')
+                                            input(id='reg_firstname', name='first_name', type='text', placeholder='Vorname', class='input-xlarge form-control')
+
+                                    div(class='control-group')
+                                        label(class='control-label' for='reg_lastname') Nachname
+                                        div(class='controls')
+                                            input(id='reg_lastname', name='last_name', type='text', placeholder='Nachname', class='input-xlarge form-control')
+
+                                    div(class='control-group')
+                                        label(class='control-label' for='reg_email') E-Mail-Adresse
+                                        div(class='controls')
+                                            input(id='reg_email', name='email', type='text', placeholder='E-Mail-Adresse', class='input-xlarge form-control')
+
+                                    div(class='control-group')
+                                        label(class='control-label' for='reg_password') Passwort
+                                        div(class='controls')
+                                            input(id='reg_password', name='password', type='password', placeholder='Passwort', class='input-xlarge form-control')
+
+                                    div(class='control-group')
+                                        label(class='control-label' for='reg_passwordrpt') Password wiederholen
+                                        div(class='controls')
+                                            input(id='reg_passwordrpt', name='passwordrpt', type='password', placeholder='Password wiederholen', class='input-xlarge form-control')
+                                    p
+                                    div(class='control-group')
+                                        div(class='controls')
+                                            button(id='reg_submit', type='submit', class='btn btn-success') Registrieren

@@ -4,8 +4,15 @@ var sha1 = require('sha1');
 module.exports = function(app){
     return {
         index: function (req, res, next) {
-            res.render('login', { title: 'Express' });
+            var loggedin = (typeof(req.session.userid) !== 'undefined') && req.session.userid;
+            if(!loggedin){
+                res.clearCookie('user_id');
+                res.render('login', { loggedin: loggedin });
+            } else {
+                res.redirect('');
+            }
         },
+
         execute: function (req, res, next) {
             var params = _.pick(req.body, 'email', 'password');
             params.password = sha1(params.password);
@@ -20,10 +27,11 @@ module.exports = function(app){
                 } else {
                     req.session.userid = false;
                     res.clearCookie('user_id');
-                    res.render('login', { failed: true });
+                    res.render('login', { error: true });
                 }
             });
         },
+
         logout: function (req, res, next) {
             req.session.userid = false;
             res.clearCookie('user_id');

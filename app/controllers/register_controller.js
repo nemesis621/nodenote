@@ -6,20 +6,21 @@ var settings = require('../../config/settings');
 module.exports = function(app){
     return {
         index: function (req, res, next) {
-            res.render('register');
+            var loggedin = (typeof(req.session.userid) !== 'undefined') && req.session.userid;
+            if(!loggedin){
+                res.clearCookie('user_id');
+            }
+            console.log('wurst');
+            res.render('register', {loggedin: loggedin});
         },
 
         validate: function (req, res, next) {
             var viewparams = {};
 
-
             var params = _.pick(req.body, 'display_name', 'first_name', 'last_name', 'email', 'password');
             params.registration_token = sha1(moment().format('MMMM Do YYYY, h:mm:ss a'));
 
-
             var error = [];
-
-
 
             if(req.body.password != req.body.passwordrpt){
                 error.push('password');
@@ -74,14 +75,21 @@ module.exports = function(app){
                 if (user.length == 1) {
                     user[0].registration_token = '';
                     user[0].active = true;
-                    user[0].save(function (err) {});
-                    res.render('login');
+                    user[0].save(function (err) {
+                        if(err){
+                            console.log(err);
+                        }
+                    });
+
+                    req.session.userid = false;
+                    res.clearCookie('user_id');
+                    res.render('register', {complete: true});
                 } else {
-                    res.render('index');
+                    req.session.userid = false;
+                    res.clearCookie('user_id');
+                    res.redirect('');
                 }
             });
-
-
         }
     }
 };

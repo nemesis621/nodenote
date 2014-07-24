@@ -7,6 +7,10 @@ module.exports = {
             res.clearCookie('user_id');
         }
 
-        res.render('index', {loggedin: loggedin});
+        if(loggedin){
+            res.render('notes', {loggedin: loggedin});
+        } else {
+            res.render('index', {loggedin: loggedin});
+        }
     }
 };
