@@ -7,6 +7,7 @@ module.exports = function (app) {
     app.get('/register/:token'          , controllers.register(app).complete);
     app.get('/login'                    , controllers.login(app).index);
     app.post('/login'                   , controllers.login(app).execute);
+    app.get('/logout'                   , controllers.login(app).logout);
 
 //    app.get( '/messages'                   , controllers.messages.list);
 //    app.post('/messages'                   , controllers.messages.create);

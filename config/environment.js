@@ -34,8 +34,5 @@ module.exports = function (app) {
         app.use(app.router);
 
         mailer.extend(app, settings.mail);
-
-
-
     });
 };

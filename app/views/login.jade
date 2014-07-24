@@ -2,7 +2,11 @@ extends layout
 
 block content
     h1 Login
+    if failed
+        p eingegebene Daten waren nich korrekt
+
     form(action='/login',method='post')
-        input(id='login_name',type='text',value='',placeholder='Name',name='name')
-        input(id='login_pass',type='text',value='',placeholder='Email',name='password')
+        input(id='login_email',type='text',value='',placeholder='Email',name='email')
+        input(id='login_pass',type='password',value='',placeholder='Passwort',name='password')
         input(type='submit',value='Login')
+    a(href="/forgotten") passwort vergessen?

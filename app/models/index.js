@@ -6,6 +6,7 @@ var connection = null;
 function setup(db, cb) {
     require('./user')(orm, db);
     require('./note')(orm, db);
+    require('./friendinvitation')(orm, db);
     return cb(null, db);
 }
 
