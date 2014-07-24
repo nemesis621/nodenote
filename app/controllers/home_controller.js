@@ -6,6 +6,7 @@ module.exports = {
         if(!loggedin){
             res.clearCookie('user_id');
         }
-        res.render('index', { title: 'NodeNotes', loggedin: loggedin});
+
+        res.render('index', {loggedin: loggedin});
     }
 };

@@ -2,7 +2,6 @@ var path     = require('path');
 var express  = require('express');
 var favicon  = require('static-favicon');
 var mailer   = require('express-mailer');
-
 var settings = require('./settings');
 var models   = require('../app/models/index');
 
@@ -22,6 +21,7 @@ module.exports = function (app) {
 
         app.use(express.cookieParser());
         app.use(express.session({secret: 'mightyplow'}));
+
 
         app.use(function (req, res, next) {
             models(function (err, db) {

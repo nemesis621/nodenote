@@ -1,0 +1,36 @@
+extends layout
+
+block content
+
+    div(class='container')
+        div(class='row')
+            div(class='col-sm-8 col-md-10 col-lg-12')
+                div(class='page-header')
+                    h3 Kontakt
+                    div(class='col-lg-8')
+                        if success
+                            br
+                            div(class='alert alert-success')
+                                a(class='close', data-dismiss='alert') &times;
+                                span Die Anfrage wurde erfolgreich dem weitergeleitet.
+                        if error
+                            br
+                            div(class='alert alert-danger')
+                                a(class='close', data-dismiss='alert') &times;
+                                span Beim Erstellen der Anfrage ist ein Fehler aufgetreten.
+                        form(class='form-horizontal', action='/contact',method='post')
+                            fieldset
+                                p
+                                div(class='control-group')
+                                    label(class='control-label' for='contact_email') E-Mail
+                                    div(class='controls')
+                                        input(id='contact_email', name='contact_email', type='text', placeholder='Deine E-Mail-Adresse', class='input-xlarge form-control', value=mailvalue)
+
+                                div(class='control-group')
+                                    label(class='control-label' for='contact_msg') Nachricht
+                                    div(class='controls')
+                                       textarea(id='contact_msg' name='contact_msg', class='form-control') #{contentvalue}
+                                p
+                                div(class='control-group')
+                                    div(class='controls')
+                                        button(id='contact_submit', name='contact_submit', class='btn btn-success') Nachricht senden

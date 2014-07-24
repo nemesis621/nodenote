@@ -6,7 +6,7 @@ var settings = require('../../config/settings');
 module.exports = function(app){
     return {
         index: function (req, res, next) {
-            res.render('register', { title: 'Express' });
+            res.render('register');
         },
 
         validate: function (req, res, next) {
@@ -44,19 +44,19 @@ module.exports = function(app){
                         throw new Error('error on creating new user');
                     } else {
                         // token email versenden
-//                        app.mailer.send('mail_registration', {
-//                            to: params.email, // REQUIRED. This can be a comma delimited string just like a normal email to field.
-//                            subject: 'complete registration at nodenotes', // REQUIRED.
-//                            title: 'complete registration',
-//                            url: url
-//                        }, function (err) {
-//                            if (err) {
-//                                // handle error
-//                                console.log(err);
-//                                return;
-//                            }
-//                            viewparams.mail_success = true;
-//                        });
+                        app.mailer.send('mail_registration', {
+                            to: params.email, // REQUIRED. This can be a comma delimited string just like a normal email to field.
+                            subject: 'complete registration at nodenotes', // REQUIRED.
+                            title: 'complete registration',
+                            url: url
+                        }, function (err) {
+                            if (err) {
+                                // handle error
+                                console.log(err);
+                                return;
+                            }
+                            viewparams.mail_success = true;
+                        });
                         viewparams.reg_success = true;
                     }
                 });

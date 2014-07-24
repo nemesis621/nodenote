@@ -72,9 +72,6 @@ module.exports.start = function (done) {
                 });
             });
 
-
-
-
             // show friends online ...
         });
 

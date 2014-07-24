@@ -12,9 +12,10 @@ var settings = {
         user     : "root",
         password : ""
     },
+    adminmails: '',
     mail         : {
         from: 'noreply@nodenotes.com',
-        host: 'mail.ba-leipzig.de', // hostname
+        host: '', // hostname
 //        secureConnection: true, // use SSL
 //        port: 587, // port for secure SMTP
         transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts

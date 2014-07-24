@@ -1,14 +1,52 @@
 doctype html
 html
     head
-        title= title
-        script(src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
-        script(src="//code.jquery.com/ui/1.11.0/jquery-ui.js")
-        script(src="/socket.io/socket.io.js")
-        script(src="/js/jquery.cookie.js")
-        script(src="/js/client.js")
+        title NodeNotes
 
-        link(rel='stylesheet', href='/css/bootstrap.min.css')
+        link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+        link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css')
         link(rel='stylesheet', href='/css/style.css')
+
+        script(src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
+        script(src='//code.jquery.com/ui/1.11.0/jquery-ui.js')
+        script(src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js')
+        script(src='/socket.io/socket.io.js')
+        script(src='/js/jquery.cookie.js')
+        script(src='/js/client.js')
+
     body
-        block content
+        nav(id='myNavbar', class='navbar navbar-default navbar-fixed-top', role='navigation')
+            div(class='container')
+                div(class='navbar-header')
+                    button(type='button', class='navbar-toggle', data-toggle='collapse', data-target='.navbar-collapse')
+                        span(class='sr-only') toggle navigation
+                        span(class='icon-bar')
+                        span(class='icon-bar')
+                        span(class='icon-bar')
+                    a(class='navbar-brand', href='/') notenodes
+                div(class='navbar-collapse collapse')
+                    ul(class='nav navbar-nav')
+                        li(class='dropdown')
+                            a(href='#', data-toggle='dropdown', class='dropdown-toggle')
+                                span friends
+                                span(class='caret')
+                            ul(class='dropdown-menu')
+                                li
+                                    a(href='#') entry1
+                                li
+                                    a(href='#') entry2
+
+        div(id='wrap')
+            div(class='container')
+                block content
+
+        footer(id='footer')
+            div(class='container')
+                ul(class='footer-links')
+                    li &copy; 2014 NodeNotes
+                    li
+                        a(href='/contact') Kontakt
+                    li
+                        a(href='/about') Impressum
+                    li
+                        a(href='/privacy') Datenschutzerklärung

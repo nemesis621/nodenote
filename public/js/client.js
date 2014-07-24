@@ -51,6 +51,17 @@ $(document).ready(function() {
 
     }
 
+
+    // Kontaktformular validieren
+    $('#contact_submit').click(function(){
+        var emailfield = $('#contact_email');
+        if(!validateEmail(emailfield.val())){
+            emailfield.parent().addClass('has-error');
+            emailfield.effect('shake', {distance: 10, times: 2});
+            return false;
+        }
+    });
+
 });
 
 function validateEmail(email) {

@@ -8,9 +8,9 @@ module.exports = function (app) {
     app.get('/login'                    , controllers.login(app).index);
     app.post('/login'                   , controllers.login(app).execute);
     app.get('/logout'                   , controllers.login(app).logout);
+    app.get('/contact'                  , controllers.contact(app).index);
+    app.post('/contact'                 , controllers.contact(app).execute);
+    app.get('/about'                    , controllers.about(app).index);
+    app.get('/privacy'                  , controllers.privacy(app).index);
 
-//    app.get( '/messages'                   , controllers.messages.list);
-//    app.post('/messages'                   , controllers.messages.create);
-//    app.get( '/message/:id'                , controllers.messages.get);
-//    app.post('/message/:messageId/comments', controllers.comments.create);
 };
