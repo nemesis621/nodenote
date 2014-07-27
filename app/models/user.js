@@ -25,9 +25,4 @@ module.exports = function (orm, db) {
             }
         }
     );
-
-
-
-
-//    User.hasOne('note', db.models.message, { required: true, reverse: 'comments', autoFetch: true });
 };

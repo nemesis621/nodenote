@@ -1,8 +1,11 @@
 extends layout
 block content
+    div(id='workbench', class='width100p height100p')
 
-    p da workbench!
-
-    input(id='invite_email',type='text',value='',placeholder='Email',name='invite_email')
-    input(id='invite_button',type='button',value='invite')
+block note_navbar
+    ul(class='nav navbar-nav')
+        li
+            a(href='javascript:void(0);')
+                span(class='glyphicon glyphicon-file')
+                span(class='glyphicon glyphicon-plus')
 

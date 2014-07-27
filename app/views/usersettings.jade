@@ -1,0 +1,51 @@
+extends layout
+
+block content
+    div(class='container')
+        div(class='row')
+            div(class='col-sm-8 col-md-10 col-lg-12')
+
+                div(class='page-header')
+                    h3 Kontoeinstellungen
+                    div(class='col-lg-8')
+                        if error
+                            br
+                            div(class='alert alert-danger')
+                                a(class='close', data-dismiss='alert') &times;
+                                span Speichern der Daten ist fehlgeschlagen ...
+                        p
+                        form(class='form-horizontal', action='/register',method='post')
+                            fieldset
+                                div(class='control-group')
+                                    label(class='control-label' for='reg_displayname') Anzeigename
+                                    div(class='controls')
+                                        input(id='reg_displayname', name='display_name', type='text', placeholder='Anzeigename', class='input-xlarge form-control')
+
+                                div(class='control-group')
+                                    label(class='control-label' for='reg_firstname') Vorname
+                                    div(class='controls')
+                                        input(id='reg_firstname', name='first_name', type='text', placeholder='Vorname', class='input-xlarge form-control')
+
+                                div(class='control-group')
+                                    label(class='control-label' for='reg_lastname') Nachname
+                                    div(class='controls')
+                                        input(id='reg_lastname', name='last_name', type='text', placeholder='Nachname', class='input-xlarge form-control')
+
+                                div(class='control-group')
+                                    label(class='control-label' for='reg_email') E-Mail-Adresse
+                                    div(class='controls')
+                                        input(id='reg_email', name='email', type='text', placeholder='E-Mail-Adresse', class='input-xlarge form-control')
+
+                                div(class='control-group')
+                                    label(class='control-label' for='reg_password') Passwort
+                                    div(class='controls')
+                                        input(id='reg_password', name='password', type='password', placeholder='Passwort', class='input-xlarge form-control')
+
+                                div(class='control-group')
+                                    label(class='control-label' for='reg_passwordrpt') Password wiederholen
+                                    div(class='controls')
+                                        input(id='reg_passwordrpt', name='passwordrpt', type='password', placeholder='Password wiederholen', class='input-xlarge form-control')
+                                p
+                                div(class='control-group')
+                                    div(class='controls')
+                                        button(id='reg_submit', type='submit', class='btn btn-success') Speichern

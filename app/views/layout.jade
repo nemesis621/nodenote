@@ -23,24 +23,66 @@ html
                         span(class='icon-bar')
                         span(class='icon-bar')
                         span(class='icon-bar')
-                    a(class='navbar-brand', href='/') notenodes
+                    a(class='navbar-brand', href='/') nodenotes
+                    block note_navbar
                 div(class='navbar-collapse collapse')
                     if loggedin
-                        ul(class='nav navbar-nav')
+
+                        ul(class='nav navbar-nav navbar-right')
+                            li(class='dropdown' id='nav_friends')
+                                a(href='#', data-toggle='dropdown', class='dropdown-toggle')
+                                    div(class='notification-icon')
+                                        span(class='glyphicon glyphicon-user')
+                                        span(class='badge')
+                                        span(class='caret')
+                                ul(class='dropdown-menu')
+                                    li(id='nofriends')
+                                        div
+                                            span Sie haben noch keine Freunde
+                            li(class='dropdown', id='nav_friendinvitation')
+                                a(href='#', data-toggle='dropdown', class='dropdown-toggle')
+                                    div(class='notification-icon')
+                                        span(class='glyphicon glyphicon-user')
+                                        span(class='glyphicon glyphicon-envelope')
+                                        span(class='badge')
+                                        span(class='caret')
+                                ul(class='dropdown-menu text-right')
+                                    li(id='noopeninv')
+                                        div
+                                            span Keine offenen Einladungen
+
                             li(class='dropdown')
                                 a(href='#', data-toggle='dropdown', class='dropdown-toggle')
-                                    span friends
+                                    div(class='notification-icon')
+                                        span(class='glyphicon glyphicon-user')
+                                        span(class='glyphicon glyphicon-plus')
+                                ul(class='dropdown-menu')
+                                    li
+                                        fieldset
+                                            div(class='control-group')
+                                                div(class='controls', id='friendinvite')
+                                                    div(class='alert alert-success displaynone') Einladung erfolgreich
+                                                    div(class='alert alert-danger displaynone')
+                                                        span Einladung fehlgeschlagen
+                                                        br
+                                                        span(id='friendinvitation_errmsg')
+                                                    input(id='invite_email',type='text',value='',placeholder='Email',name='invite_email', class='input-sm form-control stayopen')
+                                                    p
+                                                    input(id='invite_button',type='button',value='Einladung senden', class='btn btn-success btn-sm stayopen')
+                            li(class='dropdown')
+                                a(href='#', data-toggle='dropdown', class='dropdown-toggle')
+                                    span(class='glyphicon glyphicon-cog')
                                     span(class='caret')
                                 ul(class='dropdown-menu')
                                     li
-                                        a(href='#') entry1
+                                        a(href='/usersettings')
+                                            span(class='glyphicon glyphicon-wrench')
+                                            span &nbsp;&nbsp;Kontoeinstellungen
                                     li
-                                        a(href='#') entry2
+                                        a(href='/logout')
+                                            span(class='glyphicon glyphicon-off')
+                                            span &nbsp;&nbsp;Ausloggen
 
-                        ul(class='nav navbar-nav navbar-right')
-                            li
-                                a(href='/logout')
-                                    span(class='glyphicon glyphicon-off')
                     else
                         ul(class='nav navbar-nav navbar-right')
                             li
@@ -49,8 +91,7 @@ html
                                 a(href='/register') Registrieren
 
         div(id='wrap')
-            div(class='container')
-                block content
+            block content
 
         footer(id='footer')
             div(class='container')

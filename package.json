@@ -15,6 +15,7 @@
         "static-favicon": "~1.0.0",
         "express-mailer": "*",
         "socket.io": "*",
-        "sha1": "*"
+        "sha1": "*",
+        "wait.for": "*"
     }
 }

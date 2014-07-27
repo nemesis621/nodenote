@@ -5,7 +5,4 @@ module.exports = function (orm, db) {
             body      : { type: 'text', required: true },
             title : { type: 'text', required: true }
         });
-
-
-//    Comment.hasOne('message', db.models.message, { required: true, reverse: 'comments', autoFetch: true });
 };

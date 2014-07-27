@@ -1,10 +1,8 @@
-var sha1 = require('sha1');
-
-
 module.exports = function (orm, db) {
     var Friendinvitation = db.define('friendinvitation', {
             inv_id           : { type: 'serial' },
-            inv_date         : { type: 'date', required: false, time: true }
+            inv_date         : { type: 'date', required: false, time: true },
+            inv_token        : { type: 'text', required: false, time: true }
         }, {
             id: 'inv_id',
             hooks: {
@@ -26,8 +24,4 @@ module.exports = function (orm, db) {
         required: true,
         autoFetch: true
     });
-
-
-
-//    User.hasOne('note', db.models.message, { required: true, reverse: 'comments', autoFetch: true });
 };
