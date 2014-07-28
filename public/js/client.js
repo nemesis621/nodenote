@@ -22,12 +22,24 @@ $(document).ready(function() {
             });
 
             iosocket.on('new_friend_invitation', function(data){
+                console.log(data);
                 nn_addFriendinvitationEntry(data);
             });
 
             iosocket.on('new_friend', function(data){
                 nn_addFriendEntry(data);
             });
+
+            iosocket.on('response_new_note', function(data){
+                nn_setDbNoteId(data);
+            });
+
+
+            iosocket.on('new_note', function(data){
+//                console.log(data);
+                nn_addNoteToWorkbench(iosocket, false, data);
+            });
+
 
             document.on('click', '.friendinvaccept', function(){
                 nn_respondInvitation($(this), iosocket, true);
@@ -37,6 +49,9 @@ $(document).ready(function() {
                 nn_respondInvitation($(this), iosocket, false);
             });
 
+            $('#note_new').click(function(){
+                nn_addNoteToWorkbench(iosocket, true, {});
+            });
 
             $('#invite_button').click(function(e){
                 var emailfield = $('#invite_email');
@@ -108,7 +123,43 @@ $(document).ready(function() {
 
         if(error) return false;
     });
+
+
+
 });
+
+
+function nn_addNoteToWorkbench(iosocket, isNew, data){
+    var wrapper = $('#workbench');
+
+    data.note_id = data.note_id || token();
+    data.title = data.title || 'neue Notiz';
+    data.content = data.content || 'Platz für notizen...';
+    data.state = data.state || 1;
+    data.pos_x = data.pos_x || 1;
+    data.pos_y = data.pos_y || 1;
+    data.size_x = data.size_x || 1;
+    data.size_y = data.size_y || 1;
+    data.z_index = data.z_index || 1;
+
+    var newNote = $('<div class="note ui-widget-content" data-id="'+ data.note_id +'">' +
+                '<h5>'+ data.title +'</h5>' +
+                '<p>'+ data.content +'</p>' +
+            '</div>');
+    newNote.resizable().draggable();
+    wrapper.append(newNote);
+
+    if(isNew){
+        iosocket.emit('store_new_note', { random_id: data.note_id });
+    }
+}
+
+
+function nn_setDbNoteId(data){
+    var wrapper = $('#workbench');
+    var note = wrapper.find('div[data-id='+ data.random_id +']');
+    note.attr('data-id', data.note_id);
+}
 
 function nn_respondInvitation(button, iosocket, accept){
     var listitem = button.parent().parent();
@@ -126,6 +177,7 @@ function nn_respondInvitation(button, iosocket, accept){
 }
 
 function nn_addFriendEntry(objFriend){
+    console.log(objFriend);
     var wrapper = $('#nav_friends');
     var entrylist = wrapper.find('ul');
     var badge = wrapper.find('span[class=badge]');
@@ -176,6 +228,7 @@ function nn_incrementbadge(badge){
     if(value == ''){
         badge.html(1);
     } else {
+        value = parseInt(value);
         value += 1;
         badge.html(value);
     }
@@ -185,11 +238,14 @@ function nn_decrementbadge(badge){
     var value = badge.html();
     if(value == ''){
         return;
-    } else if(value == 1) {
-        badge.html('');
     } else {
-        value -= 1;
-        badge.html(value);
+        value = parseInt(value);
+        if(value == 1) {
+            badge.html('');
+        } else {
+            value -= 1;
+            badge.html(value);
+        }
     }
 }
 
@@ -197,3 +253,12 @@ function nn_validateEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 }
+
+var rand = function() {
+    return Math.random().toString(36).substr(2); // remove `0.`
+};
+
+var token = function() {
+    return rand() + rand(); // to make it longer
+};
+

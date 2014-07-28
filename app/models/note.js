@@ -2,7 +2,11 @@ var moment = require('moment');
 
 module.exports = function (orm, db) {
     var Note = db.define('note', {
-            body      : { type: 'text', required: true },
-            title : { type: 'text', required: true }
-        });
+            note_id             : { type: 'serial' },
+            content             : { type: 'text', required: true },
+            title               : { type: 'text' }
+        }, {
+            id: 'note_id'
+        }
+    );
 };

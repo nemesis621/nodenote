@@ -128,3 +128,10 @@ body {
 .height100p{
     height: 100% !important;
 }
+
+.note{
+    width: 100px;
+    height: 100px;
+    border: 1px solid grey;
+    /*background-color: yellowgreen;*/
+}

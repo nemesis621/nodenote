@@ -14,7 +14,26 @@ module.exports = function(socket){
         emitFriends(socketuser);
         emitFriendinvitations(socketuser);
             // load noteinvitations
-            // load notes
+        emitNotes(socketuser);
+    });
+
+    socket.on('store_new_note', function(data){
+        models(function (err, db) {
+            if (err) throw err;
+
+            var socketuser = conUser.getBySocketId(socket.id);
+            if(socketuser){
+                // Zettel speichern
+                db.models.note.create({title: 'neue Notiz', content: '', state: 1}, function (err, note) {
+                    var note_id = note.note_id;
+
+                    // mit Nutzer verknüpfen
+                    db.models.user_note.create({user_id: socketuser.user_id, note_id: note_id}, function (err, user_note) {
+                        socketuser.socket.emit('response_new_note', {random_id: data.random_id, note_id: note_id});
+                    });
+                });
+            }
+        });
     });
 
     socket.on('accept_friend_invitation', function (data) {
@@ -127,16 +146,22 @@ module.exports = function(socket){
     });
 }
 
+
+
 function emitFriends(socketuser){
     models(function (err, db) {
         if (err) throw err;
         var friendparams = {};
         db.models.friend.find({user_id: socketuser.user_id}, function (err, friends) {
             for (var i = 0; i < friends.length; i++) {
-                friendparams.user_id = friends[i].user_friend_id;
-                db.models.user.get(friendparams.user_id, function (err, user) {
-                    friendparams.name = user.display_name;
-                    socketuser.socket.emit('new_friend', friendparams);
+                friendparams[friends[i].user_friend_id] = {
+                    user_id: friends[i].user_friend_id
+                };
+                db.models.user.get(friends[i].user_friend_id, function (err, user) {
+                    if(user){
+                        friendparams[user.user_id].name = user.display_name;
+                        socketuser.socket.emit('new_friend', friendparams[user.user_id]);
+                    }
                 });
             }
         });
@@ -147,15 +172,47 @@ function emitFriendinvitations(socketuser){
     models(function (err, db) {
         if (err) throw err;
 
-        var friendinv_params = {}
-
+        var friendinv_params = {};
         db.models.friendinvitation.find({user_id_dest: socketuser.user_id}, function(err, friendinvitation){
             for(var i = 0; i < friendinvitation.length; i++){
-                friendinv_params.token =  friendinvitation[i].inv_token;
+
+                friendinv_params[friendinvitation[i].user_id_src] = {
+                    token: friendinvitation[i].inv_token
+                };
+
                 db.models.user.get(friendinvitation[i].user_id_src, function(err, invuser){
                     if(invuser){
-                        friendinv_params.from = invuser.display_name;
-                        socketuser.socket.emit('new_friend_invitation', friendinv_params);
+                        friendinv_params[invuser.user_id].from = invuser.display_name;
+                        socketuser.socket.emit('new_friend_invitation', friendinv_params[invuser.user_id]);
+                    }
+                });
+            }
+        });
+    });
+}
+
+function emitNotes(socketuser){
+    models(function (err, db) {
+        if (err) throw err;
+
+        var noteData = {};
+        db.models.user_note.find({user_id: socketuser.user_id}, function(err, user_note){
+            for(var i = 0; i < user_note.length; i++){
+                noteData[user_note[i].note_id] = {
+                    note_id: user_note[i].note_id,
+                    state: user_note[i].state,
+                    pos_x: user_note[i].pos_x,
+                    pos_y: user_note[i].pos_y,
+                    size_x: user_note[i].size_x,
+                    size_y: user_note[i].size_y,
+                    z_index: user_note[i].z_index
+                };
+
+                db.models.note.find({note_id: user_note[i].note_id}, function(err, note){
+                    if(note.length) {
+                        noteData[note[0].note_id].title = note[0].title;
+                        noteData[note[0].note_id].content = note[0].content;
+                        socketuser.socket.emit('new_note', noteData[note[0].note_id]);
                     }
                 });
             }

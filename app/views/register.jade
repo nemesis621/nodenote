@@ -5,25 +5,27 @@ block content
         div(class='row')
             div(class='col-sm-8 col-md-10 col-lg-12')
                 if complete
-                    // erfolgsmeldung + zum login formular weiterleiten
-                    div(class='alert alert-success')
-                        span Die Registrierung wurde erfolgreich abgeschlossen.
+                    div(class='container text-align-center')
                         br
-                        span Sie werden nun auf die Login-Seite weitergeleitet.
-                            strong(id='reg_cntdown') 5
+                        br
+                        div(class='alert alert-success')
+                            span Die Registrierung wurde erfolgreich abgeschlossen.
+                            br
+                            span Sie werden nun auf die Login-Seite weitergeleitet.
+                                strong(id='reg_cntdown') 5
 
-                        script(type='text/javascript').
-                            var SecVar = 5; // Zeit (in Sekunden)
-                            var UrlVar = "/login"; // Weiterleitungs-URL
-                            var SetInt = window.setInterval("redirCont()", 1000);
-                            function redirCont(){
-                                SecVar--;
-                                $('#reg_cntdown').html(SecVar);
-                                if(SecVar==0){
-                                    window.clearInterval(SetInt);
-                                    window.location = UrlVar;
+                            script(type='text/javascript').
+                                var SecVar = 5; // Zeit (in Sekunden)
+                                var UrlVar = "/login"; // Weiterleitungs-URL
+                                var SetInt = window.setInterval("redirCont()", 1000);
+                                function redirCont(){
+                                    SecVar--;
+                                    $('#reg_cntdown').html(SecVar);
+                                    if(SecVar==0){
+                                        window.clearInterval(SetInt);
+                                        window.location = UrlVar;
+                                    }
                                 }
-                            }
                 else
                     div(class='page-header')
                         h3 Registrieren
