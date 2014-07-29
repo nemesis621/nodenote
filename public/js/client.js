@@ -136,22 +136,57 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     data.title = data.title || 'neue Notiz';
     data.content = data.content || 'Platz für notizen...';
     data.state = data.state || 1;
-    data.pos_x = data.pos_x || 1;
-    data.pos_y = data.pos_y || 1;
-    data.size_x = data.size_x || 1;
-    data.size_y = data.size_y || 1;
+    data.pos_x = data.pos_x ||20;
+    data.pos_y = data.pos_y || 100;
+    data.size_x = data.size_x || 120;
+    data.size_y = data.size_y || 160;
     data.z_index = data.z_index || 1;
 
     var newNote = $('<div class="note ui-widget-content" data-id="'+ data.note_id +'">' +
                 '<h5>'+ data.title +'</h5>' +
                 '<p>'+ data.content +'</p>' +
             '</div>');
-    newNote.resizable().draggable();
+
+    newNote.css('left', data.pos_x);
+    newNote.css('top', data.pos_y);
+    newNote.css('width', data.size_x);
+    newNote.css('height', data.size_y);
+    newNote.css('z-index', data.z_index);
+
+    newNote.resizable({
+        minWidth: 120,
+        minHeight: 160,
+        stop: function( event, ui ) {
+            nn_storeNote(iosocket, $(this));
+        }
+    }).draggable({
+//        zIndex: data.z_index,
+        stop: function( event, ui ) {
+            nn_storeNote(iosocket, $(this));
+        }
+    });
+
     wrapper.append(newNote);
 
     if(isNew){
         iosocket.emit('store_new_note', { random_id: data.note_id });
     }
+}
+
+
+function nn_storeNote(iosocket, note){
+    var note_id = note.attr('data-id');
+    var data = {
+        note_id: note_id,
+        pos_x: note.css('left'),
+        pos_y: note.css('top'),
+        size_x: note.css('width'),
+        size_y: note.css('height'),
+        z_index: note.css('z-index')
+    };
+
+    console.log(data);
+
 }
 
 
