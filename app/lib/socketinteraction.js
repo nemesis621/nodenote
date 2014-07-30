@@ -1,7 +1,7 @@
 var models          = require('../../app/models');
 var conUser         = require('../../app/lib/connectedUser');
 var socketuserclass = require('../../app/lib/socketuser');
-
+var orm             = require('orm');
 var sha1        = require('sha1');
 var moment      = require('moment');
 
@@ -33,6 +33,41 @@ module.exports = function(socket){
                     });
                 });
             }
+        });
+    });
+
+    socket.on('store_notecredentials', function(data){
+        models(function (err, db) {
+            if (err) throw err;
+            var noteuser = conUser.getBySocketId(socket.id);
+            db.models.user_note.find({user_id: noteuser.user_id, note_id: data.note_id}, function(err, user_note){
+                if(user_note.length){
+                    user_note[0].pos_x = data.pos_x;
+                    user_note[0].pos_y = data.pos_y;
+                    user_note[0].size_x = data.size_x;
+                    user_note[0].size_y = data.size_y;
+                    user_note[0].z_index = data.z_index;
+                    user_note[0].save(function(err){});
+                }
+            });
+        });
+    });
+
+    socket.on('store_notecontent', function(data){
+        models(function (err, db) {
+            if (err) throw err;
+                var noteuser = conUser.getBySocketId(socket.id);
+                db.models.note.find({note_id: data.note_id}, function(err, note){
+                    if(note.length){
+                        note[0].title = data.title;
+                        note[0].content = data.content;
+                        note[0].save(function(err){});
+                        emitNoteChange(noteuser, data);
+                    }
+                });
+
+
+
         });
     });
 
@@ -147,6 +182,18 @@ module.exports = function(socket){
 }
 
 
+function emitNoteChange(socketuser, data){
+    models(function (err, db) {
+        if (err) throw err;
+        var params = {note_id: data.note_id, user_id: orm.ne(socketuser.user_id)};
+        db.models.user_note.find(params, function(err, user_note){
+            for(var i = 0; i < user_note.length; i++){
+                var emituser = conUser.getByUserId(user_note[i].user_id);
+                emituser.socket.emit('note_content_change', data);
+            }
+        });
+    });
+}
 
 function emitFriends(socketuser){
     models(function (err, db) {

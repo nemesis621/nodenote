@@ -36,8 +36,11 @@ $(document).ready(function() {
 
 
             iosocket.on('new_note', function(data){
-//                console.log(data);
                 nn_addNoteToWorkbench(iosocket, false, data);
+            });
+
+            iosocket.on('note_content_change', function(data){
+                nn_updateNodeContent(data);
             });
 
 
@@ -143,8 +146,8 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     data.z_index = data.z_index || 1;
 
     var newNote = $('<div class="note ui-widget-content" data-id="'+ data.note_id +'">' +
-                '<h5>'+ data.title +'</h5>' +
-                '<p>'+ data.content +'</p>' +
+                '<h5 class="width100p"><input class="width100p notetitle" type="text" value="'+ data.title +'" /></h5>' +
+                '<textarea class="width100p notecontent">'+ data.content +'</textarea>' +
             '</div>');
 
     newNote.css('left', data.pos_x);
@@ -157,12 +160,13 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
         minWidth: 120,
         minHeight: 160,
         stop: function( event, ui ) {
-            nn_storeNote(iosocket, $(this));
+            nn_storeNoteCredentials(iosocket, $(this));
+            nn_storeNoteContent(iosocket, $(this));
         }
     }).draggable({
-//        zIndex: data.z_index,
         stop: function( event, ui ) {
-            nn_storeNote(iosocket, $(this));
+            nn_storeNoteCredentials(iosocket, $(this));
+            nn_storeNoteContent(iosocket, $(this));
         }
     });
 
@@ -173,8 +177,14 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     }
 }
 
+function nn_updateNodeContent(data){
+    var wrapper = $('#workbench');
+    var note = wrapper.find('div[data-id='+ data.note_id +']');
+    note.find('.notecontent').val(data.content);
+    note.find('.notetitle').val(data.title);
+}
 
-function nn_storeNote(iosocket, note){
+function nn_storeNoteCredentials(iosocket, note){
     var note_id = note.attr('data-id');
     var data = {
         note_id: note_id,
@@ -185,10 +195,22 @@ function nn_storeNote(iosocket, note){
         z_index: note.css('z-index')
     };
 
-    console.log(data);
-
+    iosocket.emit('store_notecredentials', data);
 }
 
+function nn_storeNoteContent(iosocket, note){
+    var note_id = note.attr('data-id');
+    var content = note.find('.notecontent').val();
+    var title = note.find('.notetitle').val();
+
+    var data = {
+        note_id: note_id,
+        content: content,
+        title: title
+    };
+
+    iosocket.emit('store_notecontent', data);
+}
 
 function nn_setDbNoteId(data){
     var wrapper = $('#workbench');
