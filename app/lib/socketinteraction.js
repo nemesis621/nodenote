@@ -2,8 +2,8 @@ var models          = require('../../app/models');
 var conUser         = require('../../app/lib/connectedUser');
 var socketuserclass = require('../../app/lib/socketuser');
 var orm             = require('orm');
-var sha1        = require('sha1');
-var moment      = require('moment');
+var sha1            = require('sha1');
+var moment          = require('moment');
 
 module.exports = function(socket){
 
@@ -47,6 +47,7 @@ module.exports = function(socket){
                     user_note[0].size_x = data.size_x;
                     user_note[0].size_y = data.size_y;
                     user_note[0].z_index = data.z_index;
+                    user_note[0].color = data.color;
                     user_note[0].save(function(err){});
                 }
             });
@@ -56,18 +57,38 @@ module.exports = function(socket){
     socket.on('store_notecontent', function(data){
         models(function (err, db) {
             if (err) throw err;
-                var noteuser = conUser.getBySocketId(socket.id);
-                db.models.note.find({note_id: data.note_id}, function(err, note){
-                    if(note.length){
-                        note[0].title = data.title;
-                        note[0].content = data.content;
-                        note[0].save(function(err){});
-                        emitNoteChange(noteuser, data);
-                    }
-                });
+            var noteuser = conUser.getBySocketId(socket.id);
+            db.models.note.find({note_id: data.note_id}, function(err, note){
+                if(note.length){
+                    note[0].title = data.title;
+                    note[0].content = data.content;
+                    note[0].save(function(err){});
+                    emitNoteChange(noteuser, data);
+                }
+            });
+        });
+    });
 
-
-
+    socket.on('delete_note', function(data){
+        models(function (err, db) {
+            if (err) throw err;
+            var noteuser = conUser.getBySocketId(socket.id);
+            db.models.user_note.find({user_id: noteuser.user_id, note_id: data.note_id}, function(err, user_note){
+                if(user_note.length){
+                    user_note[0].remove(function (err) {
+                        // Note Löschen wenn keine weiteren Verknüpfungen
+                        db.models.user_note.find({note_id: data.note_id}, function(err, user_note){
+                            if(!user_note.length){
+                                db.models.note.find({note_id: data.note_id}, function(err, note){
+                                    if(note.length){
+                                        note[0].remove(function (err) {});
+                                    }
+                                })
+                            }
+                        })
+                    });
+                }
+            });
         });
     });
 
@@ -252,7 +273,8 @@ function emitNotes(socketuser){
                     pos_y: user_note[i].pos_y,
                     size_x: user_note[i].size_x,
                     size_y: user_note[i].size_y,
-                    z_index: user_note[i].z_index
+                    z_index: user_note[i].z_index,
+                    color: user_note[i].color
                 };
 
                 db.models.note.find({note_id: user_note[i].note_id}, function(err, note){

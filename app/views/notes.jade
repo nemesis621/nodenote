@@ -2,6 +2,20 @@ extends layout
 block content
     div(id='workbench', class='width100p height100p')
 
+    div(class='modal fade deletenote-modal-sm', role='dialog', aria-labelledby='Sind sie sicher?', aria-hidden='true')
+        div(class='modal-dialog modal-sm')
+            div(class='modal-content')
+                div(class='modal-header')
+                    button(type='button', class='close', data-dismiss='modal')
+                        span(aria-hidden='true') &times;
+                        span(class='sr-only') Schließen
+                    h5(class='modal-title') Notiz löschen?
+                div(class='modal-body')
+                    p Sind sie sicher, dass sie diese Notiz löschen möchten?
+                div(class='modal-footer')
+                    button(type='button', class='btn btn-default btn-sm deletenote_confirm', data-dismiss='modal', data-id='') Ja
+                    button(type='button', class='btn btn-default btn-sm', data-dismiss='modal') Nein
+
 block note_navbar
     ul(class='nav navbar-nav')
         li(class='pull-left')

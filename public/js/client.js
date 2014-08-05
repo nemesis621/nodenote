@@ -22,7 +22,6 @@ $(document).ready(function() {
             });
 
             iosocket.on('new_friend_invitation', function(data){
-                console.log(data);
                 nn_addFriendinvitationEntry(data);
             });
 
@@ -34,7 +33,6 @@ $(document).ready(function() {
                 nn_setDbNoteId(data);
             });
 
-
             iosocket.on('new_note', function(data){
                 nn_addNoteToWorkbench(iosocket, false, data);
             });
@@ -43,6 +41,18 @@ $(document).ready(function() {
                 nn_updateNodeContent(data);
             });
 
+            document.on('click', '.deleteNote_button', function(e){
+                var note_id = $(e.target).parents('.note').attr('data-id');
+                $(".deletenote-modal-sm .deletenote_confirm").attr('data-id', note_id);
+                $('.deletenote-modal-sm').modal('show');
+            });
+
+            $('.deletenote_confirm').click(function(){
+                var note_id = $(this).attr('data-id');
+                iosocket.emit('delete_note', {note_id: note_id})
+
+                $('.note[data-id='+ note_id +']').remove();
+            });
 
             document.on('click', '.friendinvaccept', function(){
                 nn_respondInvitation($(this), iosocket, true);
@@ -50,6 +60,20 @@ $(document).ready(function() {
 
             document.on('click', '.friendinvdecline', function(){
                 nn_respondInvitation($(this), iosocket, false);
+            });
+
+            document.on('focusout', '.notecontent', function(){
+                nn_storeNoteContent(iosocket, $(this).parents('.note'));
+            });
+
+            document.on('focusout', '.notetitle', function(){
+                nn_storeNoteContent(iosocket, $(this).parents('.note'));
+            });
+
+            // Dynamischer Content für FriendPopover (Notes)
+            document.on('show.bs.popover', '.friendpopover', function(){
+                var content = nn_getNoteFriendPopoverContent($(this).parents('.note'));
+                $(this).data("bs.popover").options.content= content;
             });
 
             $('#note_new').click(function(){
@@ -83,12 +107,18 @@ $(document).ready(function() {
         });
     }
 
-//    $('.dropdown-menu .stayopen').live('click', function(e) {
-//        e.stopPropagation();
-//    });
+
 
     document.on('click', '.dropdown-menu .stayopen', function(e){
         e.stopPropagation();
+    });
+
+    $('body').on('click', function (e) {
+        $('.friendpopover').each(function () {
+            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                $(this).popover('hide');
+            }
+        });
     });
 
     // Kontaktformular validieren
@@ -126,14 +156,13 @@ $(document).ready(function() {
 
         if(error) return false;
     });
-
-
-
 });
 
 
 function nn_addNoteToWorkbench(iosocket, isNew, data){
     var wrapper = $('#workbench');
+    var minwidth = 220;
+    var minheight = 200;
 
     data.note_id = data.note_id || token();
     data.title = data.title || 'neue Notiz';
@@ -141,13 +170,42 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     data.state = data.state || 1;
     data.pos_x = data.pos_x ||20;
     data.pos_y = data.pos_y || 100;
-    data.size_x = data.size_x || 120;
-    data.size_y = data.size_y || 160;
-    data.z_index = data.z_index || 1;
+    data.size_x = data.size_x || minheight;
+    data.size_y = data.size_y || minwidth;
+    data.z_index = data.z_index || 10;
+    data.color = data.color || '#FFFFFF';
 
     var newNote = $('<div class="note ui-widget-content" data-id="'+ data.note_id +'">' +
-                '<h5 class="width100p"><input class="width100p notetitle" type="text" value="'+ data.title +'" /></h5>' +
+                '<div class="noteheader">' +
+                    '<div class="notebuttons">' +
+                        '<button type="button" class="notedraghandler btn btn-default btn-xs">' +
+                            '<span class="glyphicon glyphicon-fullscreen"></span>' +
+                        '</button>' +
+                    '</div>' +
+                    '<div class="noteheadline">' +
+                        '<input class="notetitle" type="text" value="'+ data.title +'" />' +
+                    '</div>' +
+                '</div>' +
                 '<textarea class="width100p notecontent">'+ data.content +'</textarea>' +
+                '<div class="notefooter">' +
+                    '<div class="notebuttons">' +
+                        '<button type="button" class="btn btn-default btn-xs">' +
+                            '<span class="glyphicon glyphicon-tint"></span>' +
+                        '</button>' +
+                        '<button type="button" class="btn btn-default btn-xs">' +
+                            '<span class="glyphicon glyphicon-upload"></span>' +
+                        '</button>' +
+                        '<button type="button" class="btn btn-default btn-xs">' +
+                            '<span class="glyphicon glyphicon-download"></span>' +
+                        '</button>' +
+                        '<button type="button" class="btn btn-default btn-xs friendpopover">' +
+                            '<span class="glyphicon glyphicon-user"></span>' +
+                        '</button>' +
+                        '<button type="button" class="btn btn-default btn-xs deleteNote_button">' +
+                            '<span class="glyphicon glyphicon-trash"></span>' +
+                        '</button>' +
+                    '</div>' +
+                '</div>' +
             '</div>');
 
     newNote.css('left', data.pos_x);
@@ -155,18 +213,26 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     newNote.css('width', data.size_x);
     newNote.css('height', data.size_y);
     newNote.css('z-index', data.z_index);
+    newNote.css('background-color', data.color);
+
+    newNote.find('.friendpopover').popover({
+        html: true,
+        content: ' ',
+        placement: 'top'
+    });
 
     newNote.resizable({
-        minWidth: 120,
-        minHeight: 160,
+        minWidth: minwidth,
+        minHeight: minheight,
         stop: function( event, ui ) {
             nn_storeNoteCredentials(iosocket, $(this));
-            nn_storeNoteContent(iosocket, $(this));
         }
     }).draggable({
+        handle: '.notedraghandler',
+        cancel: '',
+        scroll: false,
         stop: function( event, ui ) {
             nn_storeNoteCredentials(iosocket, $(this));
-            nn_storeNoteContent(iosocket, $(this));
         }
     });
 
@@ -175,6 +241,18 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     if(isNew){
         iosocket.emit('store_new_note', { random_id: data.note_id });
     }
+}
+
+function nn_getNoteFriendPopoverContent(note){
+    // liste aller freunde zum einladen
+
+    // liste aller freunde die bereits teilen
+
+
+    return 'freunde ...';
+//    console.log(elem);
+//    var note = elem.parents('.note');
+//    return note.html();
 }
 
 function nn_updateNodeContent(data){
@@ -192,7 +270,8 @@ function nn_storeNoteCredentials(iosocket, note){
         pos_y: note.css('top'),
         size_x: note.css('width'),
         size_y: note.css('height'),
-        z_index: note.css('z-index')
+        z_index: note.css('z-index'),
+        color: note.css('background-color')
     };
 
     iosocket.emit('store_notecredentials', data);
@@ -234,7 +313,6 @@ function nn_respondInvitation(button, iosocket, accept){
 }
 
 function nn_addFriendEntry(objFriend){
-    console.log(objFriend);
     var wrapper = $('#nav_friends');
     var entrylist = wrapper.find('ul');
     var badge = wrapper.find('span[class=badge]');

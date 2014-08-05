@@ -6,7 +6,8 @@ module.exports = function (orm, db) {
             pos_y               : { type: 'number'},
             size_x              : { type: 'number'},
             size_y              : { type: 'number'},
-            z_index             : { type: 'number'}
+            z_index             : { type: 'number'},
+            color               : { type: 'text'}
         }, {
             id: 'user_note_id'
         }

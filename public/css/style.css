@@ -34,6 +34,7 @@ body {
     background-color: #F5F5F5;
     text-align: center;
     color: #777777;
+    z-index: 500;
 }
 
 .footer-links {
@@ -130,9 +131,75 @@ body {
 }
 
 .note{
-    width: 100px;
-    height: 100px;
-    border: 1px solid grey;
+    border: 1px solid #AAAAAA;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    padding: 2px;
     position: absolute !important;
+    -webkit-box-shadow: 0px 4px 18px -4px rgba(0,0,0,0.49);
+    -moz-box-shadow: 0px 4px 18px -4px rgba(0,0,0,0.49);
+    box-shadow: 0px 4px 18px -4px rgba(0,0,0,0.49);
     /*background-color: yellowgreen;*/
+}
+
+.noteheader, .notefooter{
+    position: relative;
+    width: 100%;
+    height: 28px;
+    border: 1px solid #E5E5E5;
+    background-color: #EEEEEE;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    color: #777777;
+}
+
+.noteheader {
+    top: 0;
+}
+
+.notefooter {
+    bottom: 5px;
+}
+
+
+
+.noteheader .noteheadline{
+    width: calc(100% - 30px);
+    position: relative;
+    top: -27px;
+    text-align: left;
+}
+
+.notebuttons{
+    position: relative;
+}
+
+.noteheader .notebuttons{
+    text-align: right;
+}
+
+.notefooter .notebuttons{
+    text-align: left;
+}
+
+.noteheader button, .notefooter button {
+    margin: 2px;
+}
+
+.note textarea{
+    height: calc(100% - 56px);
+    top: 30px;
+    bottom: 30px;
+    padding: 5px;
+    resize: none;
+    border: none;
+}
+.note input{
+    border: none;
+    margin-top: 3px;
+    margin-left: 2px;
+    background-color: #EEEEEE;
+    width: 100%;
 }
