@@ -10,7 +10,6 @@ module.exports = function(app){
             if(!loggedin){
                 res.clearCookie('user_id');
             }
-            console.log('wurst');
             res.render('register', {loggedin: loggedin});
         },
 
@@ -56,16 +55,17 @@ module.exports = function(app){
                                 console.log(err);
                                 return;
                             }
-                            viewparams.mail_success = true;
+                            viewparams.mail_send = true;
+                            res.render('register', viewparams);
                         });
-                        viewparams.reg_success = true;
                     }
                 });
             } else {
                 viewparams.error = error;
+                res.render('register', viewparams);
             }
-            console.log(viewparams);
-            res.render('register', viewparams);
+
+
         },
         complete: function (req, res, next) {
             var token =  req.param("token");

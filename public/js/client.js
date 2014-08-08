@@ -54,6 +54,22 @@ $(document).ready(function() {
                 $('.note[data-id='+ note_id +']').remove();
             });
 
+
+            document.on('click', '.notelayerUp', function(){
+                var note = $(this).parents('.note');
+                var currentindex = parseInt(note.css('z-index'));
+                note.css('z-index', (currentindex+1));
+                nn_storeNoteCredentials(iosocket, note);
+            });
+
+            document.on('click', '.notelayerDown', function(){
+                var note = $(this).parents('.note');
+                var currentindex = parseInt(note.css('z-index'));
+                var newIndex = currentindex == 5? 5 : (currentindex-1);
+                note.css('z-index', newIndex);
+                nn_storeNoteCredentials(iosocket, note);
+            });
+
             document.on('click', '.friendinvaccept', function(){
                 nn_respondInvitation($(this), iosocket, true);
             });
@@ -70,10 +86,19 @@ $(document).ready(function() {
                 nn_storeNoteContent(iosocket, $(this).parents('.note'));
             });
 
+            document.on('keyup', '.notecontent', function(){
+                nn_storeNoteContent(iosocket, $(this).parents('.note'));
+            });
+
+            document.on('keyup', '.notetitle', function(){
+                nn_storeNoteContent(iosocket, $(this).parents('.note'));
+            });
+
+
             // Dynamischer Content für FriendPopover (Notes)
             document.on('show.bs.popover', '.friendpopover', function(){
                 var content = nn_getNoteFriendPopoverContent($(this).parents('.note'));
-                $(this).data("bs.popover").options.content= content;
+                $(this).data("bs.popover").options.content = content;
             });
 
             $('#note_new').click(function(){
@@ -172,7 +197,7 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     data.pos_y = data.pos_y || 100;
     data.size_x = data.size_x || minheight;
     data.size_y = data.size_y || minwidth;
-    data.z_index = data.z_index || 10;
+    data.z_index = data.z_index || 30;
     data.color = data.color || '#FFFFFF';
 
     var newNote = $('<div class="note ui-widget-content" data-id="'+ data.note_id +'">' +
@@ -193,10 +218,10 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
                             '<span class="glyphicon glyphicon-tint"></span>' +
                         '</button>' +
                         '<button type="button" class="btn btn-default btn-xs">' +
-                            '<span class="glyphicon glyphicon-upload"></span>' +
+                            '<span class="glyphicon glyphicon-upload notelayerUp"></span>' +
                         '</button>' +
                         '<button type="button" class="btn btn-default btn-xs">' +
-                            '<span class="glyphicon glyphicon-download"></span>' +
+                            '<span class="glyphicon glyphicon-download notelayerDown"></span>' +
                         '</button>' +
                         '<button type="button" class="btn btn-default btn-xs friendpopover">' +
                             '<span class="glyphicon glyphicon-user"></span>' +
@@ -245,11 +270,22 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
 
 function nn_getNoteFriendPopoverContent(note){
     // liste aller freunde zum einladen
+    var html = $('<ul class=""></ul>');
+
+    for(var i in arFriends) {
+        console.log(arFriends[i]);
+        html.append('<li>' + arFriends[i] +
+                '<button type="button" class="btn btn-default btn-xs noteInviteFriend">' +
+                '<span class="glyphicon glyphicon-share-alt"></span>' +
+            '</button></li>');
+    }
+
+    // Liste offener Anfragen
 
     // liste aller freunde die bereits teilen
 
 
-    return 'freunde ...';
+    return html;
 //    console.log(elem);
 //    var note = elem.parents('.note');
 //    return note.html();
@@ -382,6 +418,17 @@ function nn_decrementbadge(badge){
             badge.html(value);
         }
     }
+}
+
+function nn_getMaxZIndex(){
+    var maxindex = 0;
+    $('.note').each(function(){
+        var tmpindex = parseInt($(this).css('z-index'));
+        if(maxindex < tmpindex){
+            maxindex = tmpindex;
+        }
+    });
+    return maxindex;
 }
 
 function nn_validateEmail(email) {
