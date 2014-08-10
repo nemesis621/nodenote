@@ -12,7 +12,7 @@ module.exports = function (orm, db) {
         autoFetch: true
     });
 
-    Friend.hasOne('user', db.models.user, {
+    Friend.hasOne('user_friend', db.models.user, {
         field: 'user_friend_id',
         required: true,
         autoFetch: true

@@ -13,13 +13,13 @@ module.exports = function (orm, db) {
         }
     );
 
-    Friendinvitation.hasOne('user', db.models.user, {
+    Friendinvitation.hasOne('user_src', db.models.user, {
         field: 'user_id_src',
         required: true,
         autoFetch: true
     });
 
-    Friendinvitation.hasOne('user', db.models.user, {
+    Friendinvitation.hasOne('user_dest', db.models.user, {
         field: 'user_id_dest',
         required: true,
         autoFetch: true

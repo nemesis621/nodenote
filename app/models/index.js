@@ -9,6 +9,7 @@ function setup(db, cb) {
     require('./friendinvitation')(orm, db);
     require('./friend')(orm, db);
     require('./user_note')(orm, db);
+    require('./noteinvitation')(orm, db);
     return cb(null, db);
 }
 

@@ -1,5 +1,5 @@
 module.exports = function (orm, db) {
-    var Friendinvitation = db.define('friendinvitation', {
+    var Noteinvitation = db.define('noteinvitation', {
             noteinv_id           : { type: 'serial' },
             noteinv_date         : { type: 'date', required: false, time: true },
             noteinv_token        : { type: 'text', required: false, time: true }
@@ -13,19 +13,19 @@ module.exports = function (orm, db) {
         }
     );
 
-    Friendinvitation.hasOne('user', db.models.user, {
+    Noteinvitation.hasOne('user_src', db.models.user, {
         field: 'user_id_src',
         required: true,
         autoFetch: true
     });
 
-    Friendinvitation.hasOne('user', db.models.user, {
+    Noteinvitation.hasOne('user_dest', db.models.user, {
         field: 'user_id_dest',
         required: true,
         autoFetch: true
     });
 
-    Friendinvitation.hasOne('note', db.models.note, {
+    Noteinvitation.hasOne('note', db.models.note, {
         field: 'note_id',
         required: true,
         autoFetch: true

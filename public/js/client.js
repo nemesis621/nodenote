@@ -22,8 +22,13 @@ $(document).ready(function() {
             });
 
             iosocket.on('new_friend_invitation', function(data){
-                nn_addFriendinvitationEntry(data);
+                nn_addInvitationEntry(data, 'friend');
             });
+
+            iosocket.on('new_note_invitation', function(data){
+                nn_addInvitationEntry(data, 'note');
+            });
+
 
             iosocket.on('new_friend', function(data){
                 nn_addFriendEntry(data);
@@ -71,11 +76,19 @@ $(document).ready(function() {
             });
 
             document.on('click', '.friendinvaccept', function(){
-                nn_respondInvitation($(this), iosocket, true);
+                nn_respondInvitation($(this), iosocket, true, 'friend');
             });
 
             document.on('click', '.friendinvdecline', function(){
-                nn_respondInvitation($(this), iosocket, false);
+                nn_respondInvitation($(this), iosocket, false, 'friend');
+            });
+
+            document.on('click', '.noteinvaccept', function(){
+                nn_respondInvitation($(this), iosocket, true, 'note');
+            });
+
+            document.on('click', '.noteinvdecline', function(){
+                nn_respondInvitation($(this), iosocket, false, 'note');
             });
 
             document.on('focusout', '.notecontent', function(){
@@ -94,6 +107,16 @@ $(document).ready(function() {
                 nn_storeNoteContent(iosocket, $(this).parents('.note'));
             });
 
+            // Shareeinladung senden
+            document.on('click', '.noteInviteFriend', function(){
+                var button = $(this);
+                var friendid = button.parents('li').attr('data-friendid');
+                var noteid = button.parents('.note').attr('data-id');
+                iosocket.emit('note_invitation', {
+                    friend_id: friendid,
+                    note_id: noteid
+                });
+            });
 
             // Dynamischer Content für FriendPopover (Notes)
             document.on('show.bs.popover', '.friendpopover', function(){
@@ -200,6 +223,12 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     data.z_index = data.z_index || 30;
     data.color = data.color || '#FFFFFF';
 
+    // Prüfen on Node bereits existiert
+    if($('div[data-id='+ data.note_id +']').length){
+        return;
+    }
+
+
     var newNote = $('<div class="note ui-widget-content" data-id="'+ data.note_id +'">' +
                 '<div class="noteheader">' +
                     '<div class="notebuttons">' +
@@ -273,8 +302,7 @@ function nn_getNoteFriendPopoverContent(note){
     var html = $('<ul class=""></ul>');
 
     for(var i in arFriends) {
-        console.log(arFriends[i]);
-        html.append('<li>' + arFriends[i] +
+        html.append('<li data-friendid="'+ i +'">' + arFriends[i] +
                 '<button type="button" class="btn btn-default btn-xs noteInviteFriend">' +
                 '<span class="glyphicon glyphicon-share-alt"></span>' +
             '</button></li>');
@@ -333,12 +361,13 @@ function nn_setDbNoteId(data){
     note.attr('data-id', data.note_id);
 }
 
-function nn_respondInvitation(button, iosocket, accept){
+function nn_respondInvitation(button, iosocket, accept, type){
     var listitem = button.parent().parent();
     var badge = listitem.parent().parent().find('span[class=badge]');
 
     var token = listitem.attr('data-token');
-    var event = accept? 'accept_friend_invitation' : 'decline_friend_invitation';
+    var event = accept? 'accept_'+ type +'_invitation' : 'decline_'+ type +'_invitation';
+
     iosocket.emit(event, {token: token});
 
     if(listitem.siblings('li').length == 1){
@@ -370,8 +399,8 @@ function nn_addFriendEntry(objFriend){
     entrylist.append(e);
 }
 
-function nn_addFriendinvitationEntry(objInv){
-    var wrapper = $('#nav_friendinvitation');
+function nn_addInvitationEntry(objInv, type){
+    var wrapper = $('#nav_invitation');
     var entrylist = wrapper.find('ul');
     var badge = wrapper.find('span[class=badge]');
 
@@ -379,12 +408,22 @@ function nn_addFriendinvitationEntry(objInv){
         return;
     }
 
+    var invtxt = '';
+    if(type == 'friend'){
+        invtxt = '<b>' + objInv.from + '</b> möchte mit dir befreundet sein';
+    } else if (type == 'note'){
+        invtxt = '<b>' + objInv.from + '</b> möchte <b>"' + objInv.title + '"</b> mit dir teilen';
+    } else {
+        return;
+    }
+
     // neuen Eintrag erzeugen
     var e = $('<li data-token="'+ objInv.token +'">' +
                 '<div>' +
-                    '<button type="button" class="stayopen invbutton friendinvaccept btn btn-default btn-xs btn-success glyphicon glyphicon-ok"></button>' +
-                    '<button type="button" class="stayopen invbutton friendinvdecline btn btn-default btn-xs btn-danger glyphicon glyphicon-remove"></button>' +
-                    '<span>'+ objInv.from +'</span>' +
+                    '<button type="button" class="stayopen invbutton '+type+'invaccept btn btn-default btn-xs btn-success glyphicon glyphicon-ok"></button>' +
+                    '<button type="button" class="stayopen invbutton '+type+'invdecline btn btn-default btn-xs btn-danger glyphicon glyphicon-remove"></button>' +
+                    '<span class="divider-vertical"></span>' +
+                    '<span>'+ invtxt +'</span>' +
                 '</div>' +
             '</li>');
 
@@ -393,6 +432,8 @@ function nn_addFriendinvitationEntry(objInv){
     nn_incrementbadge(badge);
     entrylist.append(e);
 }
+
+
 
 function nn_incrementbadge(badge){
     var value = badge.html();
