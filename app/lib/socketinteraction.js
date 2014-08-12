@@ -63,8 +63,9 @@ module.exports = function(socket){
                 if(note.length){
                     note[0].title = data.title;
                     note[0].content = data.content;
-                    note[0].save(function(err){});
-                    emitNoteChange(noteuser, data);
+                    note[0].save(function(err){
+                        emitNoteChange(noteuser, data);
+                    });
                 }
             });
         });
@@ -80,13 +81,30 @@ module.exports = function(socket){
                         // Note Löschen wenn keine weiteren Verknüpfungen
                         db.models.user_note.find({note_id: data.note_id}, function(err, user_note){
                             if(!user_note.length){
+
+                                // Offene Einladungen entfernen
+                                db.models.noteinvitation.find({note_id: data.note_id}, function(err, noteinvitation){
+                                    for(var k = 0; k < noteinvitation.length; k++){
+                                        noteinvitation[k].remove(function (err) {});
+                                    }
+                                })
+
+                                // Notiz löschen
                                 db.models.note.find({note_id: data.note_id}, function(err, note){
                                     if(note.length){
                                         note[0].remove(function (err) {});
                                     }
                                 })
+                            } else {
+                                // Alle Noteuser Benachrichtigen
+                                for(var i = 0; i < user_note.length; i++){
+                                    var emituser = conUser.getByUserId(user_note[i].user_id);
+                                    if(emituser){
+                                        emitNoteFriendData(emituser);
+                                    }
+                                }
                             }
-                        })
+                        });
                     });
                 }
             });
@@ -153,6 +171,17 @@ module.exports = function(socket){
                             emitNotes(destUser);
                         }
                         invitation[0].remove(function (err) {});
+
+                        // Alle Noteuser Benachrichtigen
+                        db.models.user_note.find({note_id: user_note.note_id}, function(err, user_note){
+                            for(var i = 0; i < user_note.length; i++){
+                                var emituser = conUser.getByUserId(user_note[i].user_id);
+                                if(emituser){
+                                    emitNoteFriendData(emituser);
+                                }
+
+                            }
+                        });
                     });
                 }
             });
@@ -164,7 +193,18 @@ module.exports = function(socket){
             if (err) throw err;
             db.models.noteinvitation.find({noteinv_token: data.token}, function (err, invitation) {
                 if(invitation.length){
+                    var note_id = invitation[0].note_id;
                     invitation[0].remove(function (err) {});
+
+                    // Alle Noteuser Benachrichtigen
+                    db.models.user_note.find({note_id: note_id}, function(err, user_note){
+                        for(var i = 0; i < user_note.length; i++){
+                            var emituser = conUser.getByUserId(user_note[i].user_id);
+                            if(emituser){
+                                emitNoteFriendData(emituser);
+                            }
+                        }
+                    });
                 }
             });
         });
@@ -200,6 +240,16 @@ module.exports = function(socket){
                                         });
                                     });
                                 }
+
+                                // Alle Noteuser Benachrichtigen
+                                db.models.user_note.find({note_id: data.note_id}, function(err, user_note){
+                                    for(var i = 0; i < user_note.length; i++){
+                                        var emituser = conUser.getByUserId(user_note[i].user_id);
+                                        if(emituser){
+                                            emitNoteFriendData(emituser);
+                                        }
+                                    }
+                                });
                             });
                         }
                     });
@@ -282,7 +332,9 @@ function emitNoteChange(socketuser, data){
         db.models.user_note.find(params, function(err, user_note){
             for(var i = 0; i < user_note.length; i++){
                 var emituser = conUser.getByUserId(user_note[i].user_id);
-                emituser.socket.emit('note_content_change', data);
+                if(emituser){
+                    emituser.socket.emit('note_content_change', data);
+                }
             }
         });
     });
@@ -357,33 +409,20 @@ function emitNoteinvitations(socketuser){
 }
 
 function emitNoteFriendData(socketuser){
-
-    var data = {
-//        1: {
-//            shared: {
-//                2: 'Tony',
-//                3: 'Kartoffel'
-//            },
-//            open: {
-//                4: 'Kevin',
-//                5: 'Alex',
-//                6: 'Paul'
-//            }
-//        }
-    };
-
+    var data = {};
     models(function (err, db) {
         if (err) throw err;
 
         db.models.user_note.find({user_id: socketuser.user_id}, function(err, user_note){
-
             for(var i = 0; i < user_note.length; i++){
                 data[user_note[i].note_id] = {
                     shared: {},
                     open: {}
                 };
 
+
                 // geteilt
+                socketuser.socket.emit('update_note_friend_shared', {note_id: user_note[i].note_id, data: {}});
                 db.models.user_note.find({note_id: user_note[i].note_id, user_id: orm.ne(socketuser.user_id)}, function(err, friend_note){
                     if(friend_note.length){
                         for(var k = 0; k < friend_note.length; k++){
@@ -395,6 +434,7 @@ function emitNoteFriendData(socketuser){
                 });
 
                 // offene Einladungen
+                socketuser.socket.emit('update_note_friend_open', {note_id: user_note[i].note_id, data: {}});
                 db.models.noteinvitation.find({note_id: user_note[i].note_id, user_id_dest: orm.ne(socketuser.user_id)}, function(err, note_invitation){
                     if(note_invitation.length){
                         for(var k = 0; k < note_invitation.length; k++){
@@ -406,7 +446,5 @@ function emitNoteFriendData(socketuser){
                 });
             }
         });
-
     });
-
 }

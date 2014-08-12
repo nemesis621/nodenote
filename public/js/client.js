@@ -52,11 +52,11 @@ $(document).ready(function() {
             });
 
             iosocket.on('update_note_friend_shared', function(data){
-                objNoteData_shared[data.note_id] = data.data;
+                nn_assumeNoteFriendData('shared', data.note_id, data.data);
             });
 
             iosocket.on('update_note_friend_open', function(data){
-                objNoteData_open[data.note_id] = data.data;
+                nn_assumeNoteFriendData('open', data.note_id, data.data);
             });
 
             document.on('click', '.deleteNote_button', function(e){
@@ -129,6 +129,9 @@ $(document).ready(function() {
                     friend_id: friendid,
                     note_id: noteid
                 });
+
+                button.parents('.popover').popover('hide');
+
             });
 
             // Dynamischer Content für FriendPopover (Notes)
@@ -168,6 +171,14 @@ $(document).ready(function() {
                     var e = $.Event('click');
                     $('#invite_button').trigger(e);
                 }
+            });
+
+            $('#arrangeNotes_vert').click(function(){
+                nn_arrangeNotesVertically(iosocket);
+            });
+
+            $('#arrangeNotes_hor').click(function(){
+                nn_arrangeNotesHorizontally(iosocket);
             });
         });
     }
@@ -374,6 +385,28 @@ function nn_setInvitableFriends(note_id){
     objNoteData_invitable[note_id] = newFriendsobj;
 }
 
+function nn_assumeNoteFriendData(type, note_id, data){
+    var arTarget = data;
+
+
+    var arCheck = type=='shared'? (objNoteData_open[note_id] || {} ): (objNoteData_shared[note_id] || {});
+
+    // überlappende Einträge aus arCheck entfernen
+    for(var i in arTarget) {
+        if(typeof arCheck[i] != 'undefined'){
+            delete arCheck[i];
+        }
+    }
+
+    if(type=='shared'){
+        objNoteData_shared[note_id] = arTarget;
+        objNoteData_open[note_id] = arCheck;
+    } else {
+        objNoteData_open[note_id] = arTarget;
+        objNoteData_shared[note_id] = arCheck;
+    }
+}
+
 
 function nn_updateNodeContent(data){
     var wrapper = $('#workbench');
@@ -490,6 +523,31 @@ function nn_addInvitationEntry(objInv, type){
 }
 
 
+function nn_arrangeNotesHorizontally(iosocket){
+    var left = 50;
+    var top = 70;
+
+    $('.note').each(function(){
+        var curNote = $(this);
+        curNote.css('left', left);
+        curNote.css('top', top);
+        left += 220;
+        nn_storeNoteCredentials(iosocket, curNote);
+    });
+}
+
+function nn_arrangeNotesVertically(iosocket){
+    var left = 50;
+    var top = 70;
+
+    $('.note').each(function(){
+        var curNote = $(this);
+        curNote.css('left', left);
+        curNote.css('top', top);
+        top += 230;
+        nn_storeNoteCredentials(iosocket, curNote);
+    });
+}
 
 function nn_incrementbadge(badge){
     var value = badge.html();
