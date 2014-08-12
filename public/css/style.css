@@ -211,3 +211,19 @@ body {
     background-color: #EEEEEE;
     width: 100%;
 }
+
+
+.note_friend_content{
+    margin-left: 0px;
+    padding-left: 0px;
+    list-style: none;
+}
+
+.note_friend_content .list_headline{
+    font-style: italic;
+    font-size: 9pt;
+}
+
+.note_friend_content .noteInviteFriend{
+    margin-right: 5px;
+}

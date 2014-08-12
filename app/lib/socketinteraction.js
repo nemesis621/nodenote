@@ -368,10 +368,6 @@ function emitNoteFriendData(socketuser){
 //                4: 'Kevin',
 //                5: 'Alex',
 //                6: 'Paul'
-//            },
-//            invitable: {
-//                7: 'Horst',
-//                8: 'Martin'
 //            }
 //        }
     };
@@ -384,36 +380,33 @@ function emitNoteFriendData(socketuser){
             for(var i = 0; i < user_note.length; i++){
                 data[user_note[i].note_id] = {
                     shared: {},
-                    open: {},
-                    invitable: {}
+                    open: {}
                 };
 
                 // geteilt
                 db.models.user_note.find({note_id: user_note[i].note_id, user_id: orm.ne(socketuser.user_id)}, function(err, friend_note){
-
-                    for(var k = 0; k < friend_note.length; k++){
-                        data[friend_note[k].note_id].shared[friend_note[k].user_id] = friend_note[k].user.display_name;
+                    if(friend_note.length){
+                        for(var k = 0; k < friend_note.length; k++){
+                            var note_id = friend_note[k].note_id;
+                            data[friend_note[k].note_id].shared[friend_note[k].user_id] = friend_note[k].user.display_name;
+                        }
+                        socketuser.socket.emit('update_note_friend_shared', {note_id: note_id, data: data[note_id].shared});
                     }
-
-                    socketuser.socket.emit('update_note_friend_data', {note_id: 1, data: data[1]});
-
-
-                    // offene Einladungen
-//                    db.models.noteinvitation.find({note_id: user_note[i].note_id, user_id_dest: orm.ne(socketuser.user_id)}, function(err, friend_note){
-//
-//                    });
                 });
 
-
-
-
-////                console.log(user.user_note[i].note);
+                // offene Einladungen
+                db.models.noteinvitation.find({note_id: user_note[i].note_id, user_id_dest: orm.ne(socketuser.user_id)}, function(err, note_invitation){
+                    if(note_invitation.length){
+                        for(var k = 0; k < note_invitation.length; k++){
+                            var note_id = note_invitation[k].note_id;
+                            data[note_id].open[note_invitation[k].user_id_dest] = note_invitation[k].user_dest.display_name;
+                        }
+                        socketuser.socket.emit('update_note_friend_open', {note_id: note_id, data: data[note_id].open});
+                    }
+                });
             }
         });
 
     });
-
-
-
 
 }

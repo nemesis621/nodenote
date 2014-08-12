@@ -1,7 +1,11 @@
 var user_id = (typeof($.cookie("user_id")) !== 'undefined')? $.cookie("user_id") : false;
 
 var arFriends = {};
-var objFriendNoteData = {};
+
+var objNoteData_shared = {};
+var objNoteData_open = {};
+var objNoteData_invitable = {};
+
 
 $(document).ready(function() {
     var document = $(this);
@@ -47,9 +51,12 @@ $(document).ready(function() {
                 nn_updateNodeContent(data);
             });
 
-            iosocket.on('update_note_friend_data', function(data){
-                objFriendNoteData[data.note_id] = data.data;
-                nn_setInvitableFriends(data.note_id);
+            iosocket.on('update_note_friend_shared', function(data){
+                objNoteData_shared[data.note_id] = data.data;
+            });
+
+            iosocket.on('update_note_friend_open', function(data){
+                objNoteData_open[data.note_id] = data.data;
             });
 
             document.on('click', '.deleteNote_button', function(e){
@@ -308,57 +315,63 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
 }
 
 function nn_getNoteFriendPopoverContent(note){
-    // liste aller freunde zum einladen
-    var html = $('<ul class=""></ul>');
+    var html = $('<ul class="note_friend_content"></ul>');
     var note_id = note.attr('data-id');
+    var bOutput = false;
 
-    if(objFriendNoteData[note_id]){
-        var objData = objFriendNoteData[note_id];
+    nn_setInvitableFriends(note_id);
 
-        var cnt = 0;
-        for(var i in objData.shared) {
-            if(cnt == 0){
-                html.append('<li>geteilt mit: </li>');
-            }
-            html.append('<li>' + objData.shared[i]  + '</li>');
-            cnt++;
+    if(nn_count(objNoteData_shared[note_id]) > 0){
+        bOutput = true;
+        var arNames = [];
+        for(var i in objNoteData_shared[note_id]) {
+            arNames.push(objNoteData_shared[note_id][i]);
         }
-
-        cnt = 0;
-        for(var i in objData.open) {
-            if(cnt == 0){
-                html.append('<li>offene Einladungen</li>');
-            }
-            html.append('<li>' + objData.open[i]  + '</li>');
-            cnt++;
-        }
-
-        cnt = 0;
-        for(var i in objData.invitable) {
-            if(cnt == 0){
-                html.append('<li>Teilen mit:</li>');
-            }
-            html.append('<li data-friendid="'+ i +'">' + objData.invitable[i] +
-                    '<button type="button" class="btn btn-default btn-xs noteInviteFriend">' +
-                    '<span class="glyphicon glyphicon-share-alt"></span>' +
-                '</button></li>');
-            cnt++;
-        }
-        return html;
+        html.append('<li class="list_headline">geteilt mit: </li>');
+        html.append('<li>' + arNames.join(', ') + '</li>');
     }
-    return false;
+
+    if(nn_count(objNoteData_open[note_id]) > 0){
+        bOutput = true;
+        var arNames = [];
+        for(var i in objNoteData_open[note_id]) {
+            arNames.push(objNoteData_open[note_id][i]);
+        }
+        html.append('<li class="list_headline">offene Einladungen: </li>');
+        html.append('<li>' + arNames.join(', ') + '</li>');
+    }
+
+    if(nn_count(objNoteData_invitable[note_id]) > 0){
+        bOutput = true;
+        html.append('<li class="list_headline">Teilen mit: </li>');
+        for(var i in objNoteData_invitable[note_id]) {
+            html.append('<li data-friendid="'+ i +'">' +
+                '<button type="button" class="btn btn-success btn-xs noteInviteFriend">' +
+                    '<span class="glyphicon glyphicon-transfer"></span>' +
+                '</button>' + objNoteData_invitable[note_id][i] +'</li>');
+        }
+    }
+
+    if(!bOutput){
+        html.append('<li class="list_headline">Sie haben noch keine Freunde auf NoteNodes</li>');
+    }
+
+    return html;
 }
 
 function nn_setInvitableFriends(note_id){
     var newFriendsobj = jQuery.extend(true, {}, arFriends);
-
-    for(var i in objFriendNoteData[note_id].shared) {
-        delete newFriendsobj[i];
+    if(objNoteData_shared[note_id]){
+        for(var i in objNoteData_shared[note_id]) {
+            delete newFriendsobj[i];
+        }
     }
-    for(var i in objFriendNoteData[note_id].open) {
-        delete newFriendsobj[i];
+    if(objNoteData_open[note_id]) {
+        for (var i in objNoteData_open[note_id]) {
+            delete newFriendsobj[i];
+        }
     }
-    objFriendNoteData[note_id].invitable = newFriendsobj;
+    objNoteData_invitable[note_id] = newFriendsobj;
 }
 
 
@@ -504,17 +517,6 @@ function nn_decrementbadge(badge){
     }
 }
 
-function nn_getMaxZIndex(){
-    var maxindex = 0;
-    $('.note').each(function(){
-        var tmpindex = parseInt($(this).css('z-index'));
-        if(maxindex < tmpindex){
-            maxindex = tmpindex;
-        }
-    });
-    return maxindex;
-}
-
 function nn_validateEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
@@ -528,3 +530,10 @@ var token = function() {
     return rand() + rand(); // to make it longer
 };
 
+function nn_count(obj) {
+    var i = 0;
+    for (var x in obj)
+        if (obj.hasOwnProperty(x))
+            i++;
+    return i;
+}
