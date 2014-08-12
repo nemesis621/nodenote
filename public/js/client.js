@@ -1,6 +1,7 @@
 var user_id = (typeof($.cookie("user_id")) !== 'undefined')? $.cookie("user_id") : false;
-var arFriends = {};
 
+var arFriends = {};
+var objFriendNoteData = {};
 
 $(document).ready(function() {
     var document = $(this);
@@ -44,6 +45,11 @@ $(document).ready(function() {
 
             iosocket.on('note_content_change', function(data){
                 nn_updateNodeContent(data);
+            });
+
+            iosocket.on('update_note_friend_data', function(data){
+                objFriendNoteData[data.note_id] = data.data;
+                nn_setInvitableFriends(data.note_id);
             });
 
             document.on('click', '.deleteNote_button', function(e){
@@ -119,9 +125,13 @@ $(document).ready(function() {
             });
 
             // Dynamischer Content für FriendPopover (Notes)
-            document.on('show.bs.popover', '.friendpopover', function(){
+            document.on('show.bs.popover', '.friendpopover', function(e){
                 var content = nn_getNoteFriendPopoverContent($(this).parents('.note'));
-                $(this).data("bs.popover").options.content = content;
+                if(!content){
+                    e.preventDefault();
+                } else {
+                    $(this).data("bs.popover").options.content = content;
+                }
             });
 
             $('#note_new').click(function(){
@@ -300,24 +310,57 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
 function nn_getNoteFriendPopoverContent(note){
     // liste aller freunde zum einladen
     var html = $('<ul class=""></ul>');
+    var note_id = note.attr('data-id');
 
-    for(var i in arFriends) {
-        html.append('<li data-friendid="'+ i +'">' + arFriends[i] +
-                '<button type="button" class="btn btn-default btn-xs noteInviteFriend">' +
-                '<span class="glyphicon glyphicon-share-alt"></span>' +
-            '</button></li>');
+    if(objFriendNoteData[note_id]){
+        var objData = objFriendNoteData[note_id];
+
+        var cnt = 0;
+        for(var i in objData.shared) {
+            if(cnt == 0){
+                html.append('<li>geteilt mit: </li>');
+            }
+            html.append('<li>' + objData.shared[i]  + '</li>');
+            cnt++;
+        }
+
+        cnt = 0;
+        for(var i in objData.open) {
+            if(cnt == 0){
+                html.append('<li>offene Einladungen</li>');
+            }
+            html.append('<li>' + objData.open[i]  + '</li>');
+            cnt++;
+        }
+
+        cnt = 0;
+        for(var i in objData.invitable) {
+            if(cnt == 0){
+                html.append('<li>Teilen mit:</li>');
+            }
+            html.append('<li data-friendid="'+ i +'">' + objData.invitable[i] +
+                    '<button type="button" class="btn btn-default btn-xs noteInviteFriend">' +
+                    '<span class="glyphicon glyphicon-share-alt"></span>' +
+                '</button></li>');
+            cnt++;
+        }
+        return html;
     }
-
-    // Liste offener Anfragen
-
-    // liste aller freunde die bereits teilen
-
-
-    return html;
-//    console.log(elem);
-//    var note = elem.parents('.note');
-//    return note.html();
+    return false;
 }
+
+function nn_setInvitableFriends(note_id){
+    var newFriendsobj = jQuery.extend(true, {}, arFriends);
+
+    for(var i in objFriendNoteData[note_id].shared) {
+        delete newFriendsobj[i];
+    }
+    for(var i in objFriendNoteData[note_id].open) {
+        delete newFriendsobj[i];
+    }
+    objFriendNoteData[note_id].invitable = newFriendsobj;
+}
+
 
 function nn_updateNodeContent(data){
     var wrapper = $('#workbench');

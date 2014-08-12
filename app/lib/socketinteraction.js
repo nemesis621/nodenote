@@ -15,6 +15,7 @@ module.exports = function(socket){
         emitFriendinvitations(socketuser);
         emitNotes(socketuser);
         emitNoteinvitations(socketuser);
+        emitNoteFriendData(socketuser)
     });
 
     socket.on('store_new_note', function(data){
@@ -353,4 +354,66 @@ function emitNoteinvitations(socketuser){
             }
         });
     });
+}
+
+function emitNoteFriendData(socketuser){
+
+    var data = {
+//        1: {
+//            shared: {
+//                2: 'Tony',
+//                3: 'Kartoffel'
+//            },
+//            open: {
+//                4: 'Kevin',
+//                5: 'Alex',
+//                6: 'Paul'
+//            },
+//            invitable: {
+//                7: 'Horst',
+//                8: 'Martin'
+//            }
+//        }
+    };
+
+    models(function (err, db) {
+        if (err) throw err;
+
+        db.models.user_note.find({user_id: socketuser.user_id}, function(err, user_note){
+
+            for(var i = 0; i < user_note.length; i++){
+                data[user_note[i].note_id] = {
+                    shared: {},
+                    open: {},
+                    invitable: {}
+                };
+
+                // geteilt
+                db.models.user_note.find({note_id: user_note[i].note_id, user_id: orm.ne(socketuser.user_id)}, function(err, friend_note){
+
+                    for(var k = 0; k < friend_note.length; k++){
+                        data[friend_note[k].note_id].shared[friend_note[k].user_id] = friend_note[k].user.display_name;
+                    }
+
+                    socketuser.socket.emit('update_note_friend_data', {note_id: 1, data: data[1]});
+
+
+                    // offene Einladungen
+//                    db.models.noteinvitation.find({note_id: user_note[i].note_id, user_id_dest: orm.ne(socketuser.user_id)}, function(err, friend_note){
+//
+//                    });
+                });
+
+
+
+
+////                console.log(user.user_note[i].note);
+            }
+        });
+
+    });
+
+
+
+
 }
