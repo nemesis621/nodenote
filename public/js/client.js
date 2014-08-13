@@ -256,7 +256,6 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
         return;
     }
 
-
     var newNote = $('<div class="note ui-widget-content" data-id="'+ data.note_id +'">' +
                 '<div class="noteheader">' +
                     '<div class="notebuttons">' +
@@ -407,7 +406,6 @@ function nn_assumeNoteFriendData(type, note_id, data){
     }
 }
 
-
 function nn_updateNodeContent(data){
     var wrapper = $('#workbench');
     var note = wrapper.find('div[data-id='+ data.note_id +']');
@@ -522,16 +520,30 @@ function nn_addInvitationEntry(objInv, type){
     entrylist.append(e);
 }
 
-
 function nn_arrangeNotesHorizontally(iosocket){
     var left = 50;
     var top = 70;
+    var max_top = 50;
+
+    var workbench_width = $('#workbench').width();
 
     $('.note').each(function(){
         var curNote = $(this);
+        var note_width = curNote.width();
+        var note_height = curNote.height();
+
+        if(( (left + note_width) > workbench_width)){
+            left = 50;
+            top = max_top;
+        }
+
         curNote.css('left', left);
         curNote.css('top', top);
-        left += 220;
+
+        left = left + (note_width + 20);
+        if(max_top < (top + note_height)){
+            max_top = top + note_height + 30;
+        }
         nn_storeNoteCredentials(iosocket, curNote);
     });
 }
@@ -539,12 +551,29 @@ function nn_arrangeNotesHorizontally(iosocket){
 function nn_arrangeNotesVertically(iosocket){
     var left = 50;
     var top = 70;
+    var max_left = 50;
+
+    var workbench_width = $('#workbench').width();
+    var workbench_height = $('#workbench').height();
 
     $('.note').each(function(){
         var curNote = $(this);
+        var note_width = curNote.width();
+        var note_height = curNote.height();
+
+        if(( (top + note_height) > workbench_height)){
+            left = max_left;
+            top = 70;
+        }
+
         curNote.css('left', left);
         curNote.css('top', top);
-        top += 230;
+
+        top = top + (note_height + 20);
+
+        if(max_left < (left + note_width)){
+            max_left = max_left + note_width + 20;
+        }
         nn_storeNoteCredentials(iosocket, curNote);
     });
 }
