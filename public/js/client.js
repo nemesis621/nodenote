@@ -249,7 +249,7 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     data.size_x = data.size_x || minheight;
     data.size_y = data.size_y || minwidth;
     data.z_index = data.z_index || 30;
-    data.color = data.color || '#FFFFFF';
+    data.color = data.color || 'rgb(255, 255, 255)';
 
     // Prüfen on Node bereits existiert
     if($('div[data-id='+ data.note_id +']').length){
@@ -267,10 +267,10 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
                         '<input class="notetitle" type="text" value="'+ data.title +'" />' +
                     '</div>' +
                 '</div>' +
-                '<textarea class="width100p notecontent">'+ data.content +'</textarea>' +
+                '<textarea class="width100p notecontent" data-color-format="">'+ data.content +'</textarea>' +
                 '<div class="notefooter">' +
                     '<div class="notebuttons">' +
-                        '<button type="button" class="btn btn-default btn-xs">' +
+                        '<button type="button" class="btn btn-default btn-xs note_colorpicker">' +
                             '<span class="glyphicon glyphicon-tint"></span>' +
                         '</button>' +
                         '<button type="button" class="btn btn-default btn-xs">' +
@@ -294,7 +294,9 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     newNote.css('width', data.size_x);
     newNote.css('height', data.size_y);
     newNote.css('z-index', data.z_index);
-    newNote.css('background-color', data.color);
+
+    var textshadowparams = 'inset 0px 0px 300px 50px';
+    newNote.find('textarea').css({ boxShadow: textshadowparams + ' ' + data.color });
 
     newNote.find('.friendpopover').popover({
         html: true,
@@ -314,6 +316,23 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
         scroll: false,
         stop: function( event, ui ) {
             nn_storeNoteCredentials(iosocket, $(this));
+        }
+    });
+
+    newNote.find('.note_colorpicker').ColorPickerSliders({
+        placement: 'top',
+        color: data.color,
+        swatches: [
+            'rgb(255, 255, 255)',
+            'rgb(255,99,71)',
+            'rgb(222,184,135)'
+        ],
+        customswatches: false,
+        order: {},
+        onchange: function(container, color) {
+            newNote.find('textarea').css({ boxShadow: textshadowparams + ' ' + color.tiny.toHexString() });
+            nn_storeNoteCredentials(iosocket, newNote);
+//            $('.cp-popover-container').popover('hide');
         }
     });
 
@@ -422,7 +441,7 @@ function nn_storeNoteCredentials(iosocket, note){
         size_x: note.css('width'),
         size_y: note.css('height'),
         z_index: note.css('z-index'),
-        color: note.css('background-color')
+        color: note.find('textarea').css('box-shadow').replace(/^.*(rgba?\([^)]+\)).*$/,'$1')
     };
 
     iosocket.emit('store_notecredentials', data);

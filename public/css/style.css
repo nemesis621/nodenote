@@ -203,6 +203,10 @@ body {
     padding: 5px;
     resize: none;
     border: none;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+
 }
 .note input{
     border: none;
