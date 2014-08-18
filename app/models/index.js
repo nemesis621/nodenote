@@ -20,6 +20,7 @@ module.exports = function (cb) {
         if (err) return cb(err);
         connection = db;
         db.settings.set('instance.returnAllErrors', true);
+        db.settings.set('instance.cache', false);
         setup(db, cb);
     });
 };

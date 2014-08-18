@@ -320,18 +320,27 @@ function nn_addNoteToWorkbench(iosocket, isNew, data){
     });
 
     newNote.find('.note_colorpicker').ColorPickerSliders({
-        placement: 'top',
+        placement: 'auto top',
         color: data.color,
         swatches: [
             'rgb(255, 255, 255)',
-            'rgb(255,99,71)',
-            'rgb(222,184,135)'
+            'rgb(192,192,192)',
+            'rgb(222,184,135)',
+            'rgb(240,230,140)',
+            'rgb(152,251,152)',
+            'rgb(102,205,170)',
+            'rgb(100,149,237)',
+            'rgb(238,130,238)',
         ],
         customswatches: false,
         order: {},
         onchange: function(container, color) {
             newNote.find('textarea').css({ boxShadow: textshadowparams + ' ' + color.tiny.toHexString() });
             nn_storeNoteCredentials(iosocket, newNote);
+
+            $("#colorpicker").trigger("colorpickersliders.hide");
+
+
 //            $('.cp-popover-container').popover('hide');
         }
     });

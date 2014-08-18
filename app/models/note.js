@@ -7,6 +7,5 @@ module.exports = function (orm, db) {
             title               : { type: 'text' }
         }, {
             id: 'note_id'
-        }
-    );
+        })
 };
