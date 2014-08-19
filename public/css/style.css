@@ -54,10 +54,12 @@ body {
 
 .page-header {
     border-bottom: 1px solid #EEEEEE;
-    margin: 40px 0 20px;
+    margin: 10px 0 20px;
     padding-bottom: 9px;
 }
-
+.index-info {
+    margin-bottom: 90px;
+}
 #contact_msg{
     resize: vertical;
     min-height: 250px;
