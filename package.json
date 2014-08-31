@@ -16,6 +16,7 @@
         "express-mailer": "*",
         "socket.io": "*",
         "sha1": "*",
-        "wait.for": "*"
+        "wait.for": "*",
+        "openid": "*"
     }
 }

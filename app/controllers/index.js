@@ -6,5 +6,6 @@ module.exports = {
     contact : require('./contact_controller'),
     about : require('./about_controller'),
     privacy : require('./privacy_controller'),
-    usersettings : require('./usersettings_controller')
+    usersettings : require('./usersettings_controller'),
+    openid : require('./openid_controller')
 };

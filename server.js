@@ -6,10 +6,8 @@ var settings    = require('./config/settings');
 var environment = require('./config/environment');
 var routes      = require('./config/routes');
 
-
 module.exports.start = function (done) {
     var app = express();
-
     environment(app);
     routes(app);
 

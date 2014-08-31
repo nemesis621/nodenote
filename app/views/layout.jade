@@ -72,26 +72,14 @@ html
                                                     input(id='invite_email',type='text',value='',placeholder='Email',name='invite_email', class='input-sm form-control stayopen')
                                                     p
                                                     input(id='invite_button',type='button',value='Einladung senden', class='btn btn-success btn-sm stayopen')
-                            li(class='dropdown')
-                                a(href='#', data-toggle='dropdown', class='dropdown-toggle')
-                                    span(class='glyphicon glyphicon-cog')
-                                    span(class='caret')
-                                ul(class='dropdown-menu')
-                                    li
-                                        a(href='/usersettings')
-                                            span(class='glyphicon glyphicon-wrench')
-                                            span &nbsp;&nbsp;Kontoeinstellungen
-                                    li
-                                        a(href='/logout')
-                                            span(class='glyphicon glyphicon-off')
-                                            span &nbsp;&nbsp;Ausloggen
+                            li
+                                a(href='/logout')
+                                    span(class='glyphicon glyphicon-off')
 
                     else
                         ul(class='nav navbar-nav navbar-right')
                             li
                                 a(href='/login') Einloggen
-                            li
-                                a(href='/register') Registrieren
 
         div(id='wrap')
             block content
