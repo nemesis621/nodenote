@@ -6,7 +6,6 @@ module.exports = function(app){
             if(!loggedin){
                 res.clearCookie('user_id');
             }
-
             res.render('about', {loggedin: loggedin});
         }
     }

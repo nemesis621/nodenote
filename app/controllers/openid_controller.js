@@ -76,6 +76,7 @@ module.exports = function(app){
                     req.models.user.find({'email': result.email}, function (err, user) {
                         if (user.length) {
                             req.session.userid = user[0].user_id;
+                            req.session.display_name = user[0].display_name;
                             res.cookie('user_id', user[0].user_id);
                             res.redirect('');
                         } else {
@@ -89,6 +90,7 @@ module.exports = function(app){
                                     res.render('login', { loggedin: false, error: true });
                                 }
                                 req.session.userid = user.user_id;
+                                req.session.display_name = user.display_name;
                                 res.cookie('user_id', user.user_id);
                                 res.redirect('');
                             });

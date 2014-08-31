@@ -10,7 +10,6 @@ module.exports = function(app){
             if(!loggedin){
                 res.clearCookie('user_id');
             }
-
             res.render('contact', {loggedin: loggedin});
         },
         execute: function (req, res, next) {
